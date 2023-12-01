@@ -13,7 +13,7 @@ $ treb7uchet
 
 Il faut trouver sur chaque ligne le premier et le dernier chiffre, donc par exemple dans `pqr3stu8vwx` c'est `3` et `8`, et dans `trb7uchet` c'est deux fois `7`.
 
-Je commence par découper la chaîne en lignes avec la fonction `Lines` que j'avais préparée :
+Je commence par découper la chaîne en lignes avec la fonction `Lines` que j'avais préparée. Enfin, je ne l'ai pas écrite mais je l'ai piquée dans cette liste de bouts de code pratiques](https://www.uiua.org/docs/isms). Elle est un peu compliquée, on ne va pas s'attarder dessus aujourd'hui.
 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
@@ -25,8 +25,6 @@ $ treb7uchet
 
 Lines
 ```
-
-Elle est un peu compliquée mais ce n'est pas très intéressant pour le moment. D'ailleurs je ne l'ai pas écrite mais piquée dans [cette liste de bouts de code pratiques](https://www.uiua.org/docs/isms).
 
 Ensuite pour traiter une ligne, je vais la dupliquer puis créer un masque des caractères qui sont compris entre `0` et `9`.
 
