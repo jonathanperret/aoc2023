@@ -124,7 +124,7 @@ Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
 ⊗ □"two" Digits
 ```
 
-On cherche `□"two"`, soit une chaîne mise en boîte par `box`, et pas simplement `"two"` parce que `Digits` n'est pas directement un tableau de chaînes, ce qui serait impossible car elles sont de longueur variable et les tableaux en Uiua doivent être réguliers, mais un tableau de boîtes contenant chacune une chaîne. La syntaxe `{ "one" "two" "threeé }` permet de créer facilement ce genre de tableaux de boîtes ; elle est équivalente à `[ □"one" □"two" □"three" ]`.
+On cherche `□"two"`, soit une chaîne mise en boîte par `box`, et pas simplement `"two"` parce que `Digits` n'est pas directement un tableau de chaînes, ce qui serait impossible car elles sont de longueur variable et les tableaux en Uiua doivent être réguliers, mais un tableau de boîtes contenant chacune une chaîne. La syntaxe `{ "one" "two" "three" }` permet de créer facilement ce genre de tableaux de boîtes ; elle est équivalente à `[ □"one" □"two" □"three" ]`.
 
 Comme il y a deux occurrences de chaque chiffre dans ma liste (`2` et `two`), il faut soustraire `9` aux indices qui dépassent 9 afin que ce `11` devienne `2`. Mais je ne veux faire cette soustraction que si l'indice est supérieur à 9. Pour ce faire, je duplique l'indice et je le compare à 9 avec `>9.`, ce qui me donne `0` ou `1` selon le résultat de la comparaison ; puis j'utilise une [switch function](https://www.uiua.org/docs/controlflow#switch) qui permet de choisir entre deux fonctions selon un entier. Ici, si le résultat de la comparaison est `0` j'applique `identity`, sinon je soustrais 9 avec `-9` . Ça s'écrit donc `(∘|-9)>9.`.
 
@@ -240,7 +240,7 @@ PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢regex DigitRE|�
 PartTwoLine "2fourseven1oneights"
 ```
 
-La solution complète qui fonctionne toujours sur l'exemple mais donne la bonne réponse sur l'entrée :
+La solution complète qui fonctionne toujours sur l'exemple mais donne aussi la bonne réponse sur l'entrée :
 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
