@@ -28,9 +28,26 @@ Lines
 
 Ensuite pour traiter une ligne, je vais la dupliquer puis créer un masque des caractères qui sont compris entre `0` et `9`.
 
-En appliquant `≥@0` j'obtiens un masque des caractères plus grands que `0` dans l'ordre ASCII, soit `[1 1 1 1 1]` pour `1abc2`, et en appliquant `<=@9` un masque de ceux qui viennent avant `9` soit `[1 0 0 0 1]` pour la même chaîne (à la réflexion j'aurais pu me contenter de ce dernier test, car il me semble qu'aucun caractère dans l'entrée n'est plus petit que `0` !).
+En appliquant `≥@0` j'obtiens un masque des caractères plus grands que `0` dans l'ordre ASCII :
+```
+$ 1abc2
+≥@0 .
+```
+Et en appliquant `<=@9` un masque de ceux qui viennent avant `9` :
+```
+$ 1abc2
+<=@9 .
+```
 
-Pour appliquer ces deux tests sur la même chaîne, j'utilise `fork` qui prend deux fonctions et les applique successivement sur une valeur, ce qui donne `⊃(≥@0|≤@9)`.
+(à la réflexion j'aurais pu me contenter de ce dernier test, car il me semble qu'aucun caractère dans l'entrée n'est plus petit que `0` !)
+
+Pour appliquer ces deux tests sur la même chaîne, j'utilise `fork` qui prend deux fonctions et les applique successivement sur une valeur, ce qui donne `⊃(≥@0|≤@9)` :
+
+```
+$ 1abc2
+.          # on duplique la chaîne
+⊃(≥@0|≤@9) # on teste chaque caractère par rapport à 0 et 9
+```
 
 Il faut ensuite combiner les deux masques avec un `ET` logique. Cet opérateur n'existe pas tel quel en Uiua mais comme les booléens sont représentés par `0` et `1` il suffit d'appliquer `minimum` ou encore `multiply` pour obtenier l'effet souhaité.
 
@@ -41,7 +58,7 @@ $ 1abc2
 ↧          # on prend le minimum (ET logique) des deux masques obtenus
 ```
 
-J'utilise ensuite ce masque (`[1 0 0 0 1]` pour `1abc2`) pour ne conserver que les caractères de la chaîne qui sont bien des chiffres grâce à `keep` (après avoir perdu 5 minutes à confondre `keep` avec `select`…) :
+J'utilise ensuite ce masque pour ne conserver que les caractères de la chaîne qui sont bien des chiffres grâce à `keep` (après avoir perdu 5 minutes à confondre `keep` avec `select`…) :
 
 ```
 $ 1abc2
@@ -49,7 +66,12 @@ $ 1abc2
 ▽             # on ne garde que les chiffres
 ```
 
-Maintenant que j'ai isolé les chiffres, je ne veux garder que le premier, qu'on peut obtenir avec `first`, et le dernier qu'on obtient en appliquant `reverse` avant `first`, soit `⊢⇌`. Je vais encore utiliser `fork`, donc `⊃(⊢|⊢⇌)`.
+Maintenant que j'ai isolé les chiffres, je ne veux garder que le premier, qu'on peut obtenir avec `first`, et le dernier qu'on obtient en appliquant `reverse` avant `first`, soit `⊢⇌`. Je vais encore utiliser `fork`, donc `⊃(⊢|⊢⇌)` :
+
+```
+$ 12345
+⊃(⊢|⊢⇌)
+```
 
 Les deux caractères ainsi obtenus sont rassemblés en une liste — donc une chaîne — par `couple`, puis on peut appliquer `parse` pour lire cette chaîne comme un entier :
 
@@ -113,7 +135,7 @@ regex "0|1|2|3|4|5|6|7|8|9|one|two|three|four|five|six|seven|eight|nine"
 
 Ça fonctionne pour isoler les chiffres écrits en toutes lettres. Mais il me reste à faire la correspondance entre `one` et `1`, `two` et `2`, etc.
 
-Si j'avais une liste des chaînes pouvant représenter un chiffre, il me suffirait de trouver la position de `two` dans cette liste pour connaître sa valeur. Je construis donc une liste de ces chaîneset j'utilise `indexof` pour chercher dedans :
+Si j'avais une liste des chaînes pouvant représenter un chiffre, il me suffirait de trouver la position de `two` dans cette liste pour connaître sa valeur. Je construis donc une liste de ces chaînes et j'utilise `indexof` pour chercher dedans :
 
 ```
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
@@ -225,7 +247,7 @@ Xeger "0|1|2|one|four|seven|eight|nine" "2fourseven1oneights"
 
 J'ai utilisé `both` pour appliquer `reverse` à chacun des deux arguments de la fonction.
 
-Je remplace donc `(⊢|⊢⇌)regex DigitRE` par `(⊢regex DigitRE|⊢Xeger DigitRE)` dans ma fonction `PartTwoLine`.
+Je remplace donc `⊃(⊢|⊢⇌)regex DigitRE` par `⊃(⊢regex DigitRE|⊢Xeger DigitRE)` dans ma fonction `PartTwoLine`.
 
 ```
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
