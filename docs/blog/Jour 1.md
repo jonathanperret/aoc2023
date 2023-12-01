@@ -13,7 +13,7 @@ $ treb7uchet
 
 Il faut trouver sur chaque ligne le premier et le dernier chiffre, donc par exemple dans `pqr3stu8vwx` c'est `3` et `8`, et dans `trb7uchet` c'est deux fois `7`.
 
-Je commence par découper la chaîne en lignes avec la fonction `Lines` que j'avais préparée. Enfin, je ne l'ai pas écrite mais je l'ai piquée dans cette liste de bouts de code pratiques](https://www.uiua.org/docs/isms). Elle est un peu compliquée, on ne va pas s'attarder dessus aujourd'hui.
+Je commence par découper la chaîne en lignes avec la fonction `Lines` que j'avais préparée. Enfin, je ne l'ai pas écrite mais je l'ai piquée dans [cette liste de bouts de code pratiques](https://www.uiua.org/docs/isms). Elle est un peu compliquée, on ne va pas s'attarder dessus aujourd'hui.
 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
@@ -151,7 +151,7 @@ Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
 parse +@0 ≡((∘|-9)>9. ⊗ : Digits) { "1" "three" }
 ```
 
-Au passage, comme j'ai maintenant dans `Digit` une liste des chaînes à chercher, je peux m'en servir pour construire l'expression régulière de recherche, plutôt que de répéter la liste dans le code. Là encore je pique deux fonctions dans les [Uiuaisms](https://www.uiua.org/docs/isms) : une pour insérer un caractère `|` entre les chaînes, une autre pour concaténer toutes les chaînes.
+Au passage, comme j'ai maintenant dans `Digit` une liste des chaînes à chercher, je peux m'en servir pour construire l'expression régulière de recherche, plutôt que de répéter la liste dans le code. Là encore je pique deux fonctions dans les [Uiuisms](https://www.uiua.org/docs/isms) : une pour insérer un caractère `|` entre les chaînes, une autre pour concaténer toutes les chaînes.
 
 ```
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
