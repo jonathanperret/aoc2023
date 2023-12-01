@@ -206,7 +206,7 @@ Xeger ← ≡⇌ regex ∩⇌
 Xeger "0|1|2|one|four|seven|eight|nine" "2fourseven1oneights"
 ```
 
-J'ai utilisé `∩` pour appliquer `⇌` à chacun des deux arguments de la fonction.
+J'ai utilisé `both` pour appliquer `reverse` à chacun des deux arguments de la fonction.
 
 Je remplace donc `(⊢|⊢⇌)regex DigitRE` par `(⊢regex DigitRE|⊢Xeger DigitRE)` dans ma fonction `PartTwoLine`.
 
