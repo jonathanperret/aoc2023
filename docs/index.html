@@ -1,0 +1,95 @@
+<!DOCTYPE html><html lang="en"><head>
+  <title>Uiua</title>
+  <link rel="icon" href="/favicon.ico">
+  <noscript>
+    <style>
+      .jsonly {
+        display: none
+      }
+    </style>
+  </noscript>
+  <!-- Begin Single Page Apps for GitHub Pages -->
+  <script type="text/javascript">
+    // Single Page Apps for GitHub Pages
+    // MIT License
+    // https://github.com/rafgraph/spa-github-pages
+    // This script checks to see if a redirect is present in the query string,
+    // converts it back into the correct url and adds it to the
+    // browser's history using window.history.replaceState(...),
+    // which won't cause the browser to attempt to load the new url.
+    // When the single page app is loaded further down in this file,
+    // the correct url will be waiting in the browser's history for
+    // the single page app to route accordingly.
+    (function (l) {
+      if (l.search[1] === '/') {
+        var decoded = l.search.slice(1).split('&').map(function (s) {
+          return s.replace(/~and~/g, '&')
+        }).join('?');
+        window.history.replaceState(null, null,
+          l.pathname.slice(0, -1) + decoded + l.hash
+        );
+      }
+    }(window.location))
+  </script>
+  <!-- End Single Page Apps for GitHub Pages -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A stack-based array programming language">
+  <script type="module">import init from '/site-f04106ae32625989.js';init('/site-f04106ae32625989_bg.wasm');</script>
+  
+  <link rel="stylesheet" href="/styles-ae9c56ece7df8dca.css">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+<link rel="preload" href="/site-f04106ae32625989_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
+<link rel="modulepreload" href="/site-f04106ae32625989.js"></head>
+
+<body>
+  <div id="top">
+    <h1>Mon Advent of Code 2023</h1>
+    <div>
+      <noscript>
+        <p>JavaScript is required on this site. Please enable it and reload the page.</p>
+      </noscript>
+      <h3 class="jsonly running-text">Chargement en cours...</h3>
+    </div>
+  </div>
+
+
+
+<script>(function () {
+    var protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    var url = protocol + '//' + window.location.host + '/_trunk/ws';
+    var poll_interval = 5000;
+    var reload_upon_connect = () => {
+        window.setTimeout(
+            () => {
+                // when we successfully reconnect, we'll force a
+                // reload (since we presumably lost connection to
+                // trunk due to it being killed, so it will have
+                // rebuilt on restart)
+                var ws = new WebSocket(url);
+                ws.onopen = () => window.location.reload();
+                ws.onclose = reload_upon_connect;
+            },
+            poll_interval);
+    };
+
+    var ws = new WebSocket(url);
+    ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.reload) {
+            window.location.reload();
+        }
+    };
+    ws.onclose = reload_upon_connect;
+})()
+</script></body></html>
