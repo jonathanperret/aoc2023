@@ -1,21 +1,44 @@
 Lines ← &i "tools.ua" "Lines"
 Aeq ← ⍤⊃($"expected _ got _")≍
 
-Parse ← ⊜(□ ⊜parse ≠@\n.) ¬⌕"\n\n".
+PartOneLine ← parse ⊟⊃(⊢|⊢⇌)▽↧⊃(≥@0|≤@9).⊔
+PartOne ← /+≡(PartOneLine ⊔)Lines
 
-# PartOne ← /+⊏↙3⍖.≡(/+⊔)Parse
+Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+          "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
+DigitRE ← ⊐/⊂↘1♭≡⊂ "|"Digits
+Xeger ← ≡⇌regex ∩⇌
+
+PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢regex DigitRE|⊢Xeger DigitRE)⊔
+PartTwo ← /+≡PartTwoLine Lines
 
 ---
-$ 10
+$ 1abc2
+$ pqr3stu8vwx
+$ a1b2c3d4e5f
+$ treb7uchet
 
-Parse
-dump∘
+Aeq 142 PartOne .
 
-# Aeq 90 PartOne
+Aeq 43 PartTwoLine"abc4one2threexyz"
+
+$ two1nine
+$ eightwothree
+$ abcone2threexyz
+$ xtwone3four
+$ 4nineeightseven2
+$ zoneight234
+$ 7pqrstsixteen
+
+Aeq 281 PartTwo
+
+Aeq {"eight" "6"} Xeger DigitRE "6oneighthlf"
+
+Aeq 68 PartTwoLine "6oneighthlf"
 
 &p "Tests OK"
 
 ---
 
-# &p PartOne &fras "day1.txt"
-# &p PartTwo &fras "day1.txt"
+&p PartOne &fras "day1.txt"
+&p PartTwo &fras "day1.txt"
