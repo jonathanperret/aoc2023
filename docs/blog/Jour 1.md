@@ -144,12 +144,31 @@ Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
 ≡((∘|-9)>9. ⊗ : Digits) { "1" "three" }
 ```
 
-Comme j'ai maintenant une liste des chaînes à chercher, je peux m'en servir pour construire l'expression régulière de recherche, plutôt que de répéter la liste dans le code. Là encore je pique deux fonctions sur https://www.uiua.org/docs/isms : une pour insérer un caractère `|` entre les chaînes, une autre pour concaténer toutes les chaînes.
+Enfin, je convertis ces deux indices en caractères (en ajoutant le caractère `@0`) et j'appelle `parse` :
+
+```
+Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+          "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
+
+parse +@0 ≡((∘|-9)>9. ⊗ : Digits) { "1" "three" }
+```
+
+Au passage, comme j'ai maintenant dans `Digit` une liste des chaînes à chercher, je peux m'en servir pour construire l'expression régulière de recherche, plutôt que de répéter la liste dans le code. Là encore je pique deux fonctions dans les [Uiuaisms](https://www.uiua.org/docs/isms) : une pour insérer un caractère `|` entre les chaînes, une autre pour concaténer toutes les chaînes.
 
 ```
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
           "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
 DigitRE ← ⊐/⊂↘1♭≡⊂ "|" Digits
+
+DigitRE
+```
+
+En fait il y avait plus simple en utilisant les "chaînes à trous" de Uiua, c'est-à-dire que `$"hello, _"` crée une fonction qui si on lui passe `"world"` renvoie `hello, world`. La fonction `$"_|_"` appliquée à deux chaînes les concatène donc en les séparant par un caractère `|`. Il n'y a plus qu'à appliquer cette fonction de façon répétée avec `reduce`. Il reste une petite subtilité parce que `Digits` reste une liste de boîtes, pas de chaînes, et on veut passer des chaînes à `$"_|_"`. On peut s'en sortir en écrivant `$"_|_"∩⊔`, qui utilise `both` et `unbox` pour "déballer" les deux arguments, ou bien on peut utiliser `pack` qui est un modificateur un peu magique censé automatiquement emballer/déballer les valeurs quand il le faut. En tout cas, ici ça marche 🤷.
+
+```
+Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+          "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
+DigitRE ← /⊐$"_|_" Digits
 
 DigitRE
 ```
@@ -161,7 +180,7 @@ Lines ← ⊕□⍜▽¯:\+.=, @\n
 
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
           "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
-DigitRE ← ⊐/⊂↘1♭≡⊂ "|" Digits
+DigitRE ← /⊐$"_|_" Digits
 
 PartTwoLine ← parse +@0≡((∘|-9)>9. indexof : Digits)⊟⊃(⊢|⊢⇌)regex DigitRE ⊔
 PartTwo ← /+≡PartTwoLine Lines
@@ -213,7 +232,7 @@ Je remplace donc `(⊢|⊢⇌)regex DigitRE` par `(⊢regex DigitRE|⊢Xeger Dig
 ```
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
           "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
-DigitRE ← ⊐/⊂↘1♭≡⊂ "|" Digits
+DigitRE ← /⊐$"_|_" Digits
 Xeger ← ≡⇌ regex ∩⇌
 
 PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢regex DigitRE|⊢Xeger DigitRE)⊔
@@ -221,18 +240,18 @@ PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢regex DigitRE|�
 PartTwoLine "2fourseven1oneights"
 ```
 
-La solution complète qui fonctionne toujours sur l'exemple mais donne la bonne réponse sur l'entrée complète :
+La solution complète qui fonctionne toujours sur l'exemple mais donne la bonne réponse sur l'entrée :
 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
 
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
           "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
-DigitRE ← ⊐/⊂↘1♭≡⊂ "|" Digits
+DigitRE ← /⊐$"_|_" Digits
 Xeger ← ≡⇌ regex ∩⇌
 
-PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢regex DigitRE|⊢Xeger DigitRE)⊔
-PartTwo ← /+≡PartTwoLine Lines
+PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢regex DigitRE|⊢Xeger DigitRE)
+PartTwo ← /+≡(PartTwoLine ⊔) Lines
 
 $ two1nine
 $ eightwothree
