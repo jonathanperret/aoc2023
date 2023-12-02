@@ -186,6 +186,12 @@ IsPossible [3_4_0 13_12_10 1_3_4]
 On y est presque pour la partie 1. Je sais déterminer si une partie est possible, je peux donc appliquer ce test à toutes les parties identifiées :
 
 ```
+Lines ← ⊕□⍜▽¯:\+.=, @\n
+ExtractRGB ← [⊃(⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@g)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@b)(⋅⋅⋅0))≡(⊔⊢⊔).]
+ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢regex "\\d+ [rgb]"⊔)regex "[^,]+" ⊔)regex "[^;]+" ↘8
+Parse ← ≡(□ ParseGame ⊔) Lines
+IsPossible ← /↧♭≡(≤12_13_14)
+
 $ Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 $ Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 $ Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
