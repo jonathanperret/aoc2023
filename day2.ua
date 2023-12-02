@@ -1,7 +1,7 @@
 Lines ← &i "tools.ua" "Lines"
 Aeq ← ⍤⊃($"expected _ got _")≍
 
-ExtractRGB ← [⊃(⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@g)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@b)(⋅⋅⋅0))≡(⊔⊢⊔).]
+ExtractRGB ← /↥≡(×⊃(="rgb"⊢|⊡1)⊔)
 ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢regex "\\d+ [rgb]"⊔)regex "[^,]+" ⊔)regex "[^;]+" ↘8
 Parse ← ≡(□ ParseGame ⊔) Lines
 
