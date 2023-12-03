@@ -25,7 +25,7 @@ $ .664.598..
 
 Et il faut identifier tous les chiffres qui sont adjacents (même en diagonale) à un symbole autre que "." (ou un autre chiffre).
 
-Au moins, aujourd'hui pas d'excude de difficulté de _parsing_ ! Après le découpage en lignes il me suffit d'enlever les boîtes superflues (comme toutes les lignes ont la même longueur) avec `unbox` :
+Au moins, aujourd'hui pas d'excuse de difficulté de _parsing_ ! Après le découpage en lignes il me suffit d'enlever les boîtes superflues (comme toutes les lignes ont la même longueur) avec `unbox` :
 
 ```
 $ 467..114..
@@ -53,6 +53,9 @@ Comment faire ? Déjà, je devrais pouvoir facilement, sur une ligne donnée, i
 Je pourrais aussi faire l'inverse : pour chaque symbole trouvé dans la matrice, marquer les 8 cases qui l'entourent. Ensuite un nombre n'est valide que s'il recouvre au moins une case marquée. Cette dernière option me paraît un peu plus simple, alors allons-y.
 
 ```
+Lines ← ⊕□⍜▽¯:\+.=, @\n
+Parse ← ≡⊔Lines
+
 $ ....
 $ ....
 $ .*..
@@ -190,7 +193,7 @@ Neighbors ← /↥≡(UnGrow ↻ ⊙Grow) [
 Neighbors
 ```
 
-Mais comme je suis joueur, j'aimerais pouvoir exprimer ça en utilisant `under`. `under` est un super modificateur dans Uiua qui permet justement d'exprimer le genre d'opération où on vuet appliquer une transformation, faire un traitement puis appliquer la transformation inverse.
+Mais comme je suis joueur, j'aimerais pouvoir exprimer ça en utilisant `under`. `under` est un super modificateur dans Uiua qui permet justement d'exprimer le genre d'opération où on veut appliquer une transformation, faire un traitement puis appliquer la transformation inverse.
 
 Par exemple, si je veux doubler uniquement le premier nombre d'une liste, je peux utiliser `under` avec `first` :
 
@@ -248,7 +251,7 @@ Pour simplifier, je peux faire ce traitement ligne à ligne. Considérons donc u
 
 Pour isoler les nombres déjà, je peux créer un masque avec `member` qui m'indique où sont les chiffres :
 ```
-".12.34."
+".12.34.56."
 
 ∊:"0123456789".
 ```
@@ -263,7 +266,7 @@ Puis utiliser `partition`, on a l'habitude maintenant :
 
 C'est sympa mais il faut que je sache lesquels de ces nombres recouvrent mon masque de voisinage.
 
-L'astuce à laquelle j'ai pensée, c'est que je peux utiliser le masque des chiffres, soit `0_1_1_0_1_1_0_1_1_0` pour la chaîne `".12.34.56."`, pour partitionner non pas la chaîne mais le masque des voisins (ici `1_1_1_0_0_1_0_0_0_0`). J'isolerai ainsi trois groupes : `1_1`, `0_1` et `0_0`. Chacun de ces groupes est de la même longueur que le nombre correspondant, et représente un masque qui m'indique pour chaque chiffre s'il est voisin d'un symbole.
+L'astuce à laquelle j'ai pensé, c'est que je peux utiliser le masque des chiffres, soit `0_1_1_0_1_1_0_1_1_0` pour la chaîne `".12.34.56."`, pour partitionner non pas la chaîne mais le masque des voisins (ici `1_1_1_0_0_1_0_0_0_0`). J'isolerai ainsi trois groupes : `1_1`, `0_1` et `0_0`. Chacun de ces groupes est de la même longueur que le nombre correspondant, et représente un masque qui m'indique pour chaque chiffre s'il est voisin d'un symbole.
 
 Je peux ensuite faire un `ET` logique sur chaque groupe avec un classique `reduce` de `minimum`, que je passe directemnt comme fonction à `partition` :
 
