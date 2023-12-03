@@ -108,7 +108,7 @@ Maintenant je veux fusionner ces 8 matrices décalées, j'utilise `reduce` avec 
 
 ```
 Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
-Neighbors = /+ ≡↻ Directions ¤
+Neighbors = /↥ ≡↻ Directions ¤
 
 [0_0_0_0
  0_0_0_0
@@ -125,7 +125,7 @@ Mais je suis pris d'un horrible doute :
 
 ```
 Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
-Neighbors = /+ ≡↻ Directions ¤
+Neighbors = /↥ ≡↻ Directions ¤
 
 [1_0_0_0
  0_0_0_0
@@ -257,7 +257,7 @@ C'est sympa mais il faut que je sache lesquels de ces nombres recouvrent mon mas
 
 L'astuce à laquelle j'ai pensé, c'est que je peux utiliser le masque des chiffres, soit `0_1_1_0_1_1_0_1_1_0` pour la chaîne `".12.34.56."`, pour partitionner non pas la chaîne mais le masque des voisins (ici `1_1_1_0_0_1_0_0_0_0`). J'isolerai ainsi trois groupes : `1_1`, `0_1` et `0_0`. Chacun de ces groupes est de la même longueur que le nombre correspondant, et représente un masque qui m'indique pour chaque chiffre s'il est voisin d'un symbole.
 
-Je peux ensuite faire un `ET` logique sur chaque groupe avec un classique `reduce` de `minimum`, que je passe directemnt comme fonction à `partition` :
+Je peux ensuite faire un `OU` logique sur chaque groupe avec un classique `reduce` de `maximum`, que je passe directemnt comme fonction à `partition` :
 
 ```
 1_1_1_0_0_1_0_0_0_0
