@@ -10,10 +10,8 @@ Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
 UnGrow ← ≡(↘2↻¯1)↘2↻¯1
 Grow ← setund(Grow|Grow|UnGrow)
 
-Neighbors ← /↥≡(⍜(⊙Grow)↻) [
-  [¯1 ¯1] [¯1 0] [¯1 1]
-  [0 ¯1] [1 0]
-  [1 ¯1] [0 1] [1 1]] ¤
+Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
+Neighbors ← /↥≡(⍜(⊙Grow)↻) Directions ¤
 
 KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
 
@@ -27,7 +25,7 @@ PartOne ← (
 
 FindGears ← =@*
 SplitMask ← ≡(⍜⊡⋅1)⊙¤⊃(⊚|∵⋅0)
-KeepAllNumbers ← /⊐⊂⊐≡KeepNumbers
+KeepAllNumbers ← /⊐⊂ ≡(□KeepNumbers)
 GearRatio ← (⋅0|/×) =2 ⧻.
 
 PartTwo ← (

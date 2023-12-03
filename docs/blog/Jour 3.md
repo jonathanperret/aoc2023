@@ -10,7 +10,7 @@ Un moteur d'Elfe à réparer. Typique.
 
 OK, on a une matrice de caractères qui ressemble à ça :
 
-```
+```no_run
 $ 467..114..
 $ ...*......
 $ ..35..633.
@@ -93,16 +93,13 @@ Je connais une opération qui permet de "décaler" une matrice, c'est `rotate`. 
 C'est exactement ce qu'il me faut. Il faut juste que je l'applique dans chacune des 8 directions qui m'intéressent :
 
 ```
+Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
 [0_0_0_0
  0_0_0_0
  0_1_0_0
  0_0_0_0
  0_0_0_0]
-≡↻ [
-  [¯1 ¯1] [¯1 0] [¯1 1]
-  [0 ¯1] [1 0]
-  [1 ¯1] [0 1] [1 1]
-] ¤
+≡↻ Directions ¤
 ```
 
 Noter l'utilisation de `fix` avec `rows` pour répéter le même tableau cible comme deuxième argument de `rotate`.
@@ -110,11 +107,8 @@ Noter l'utilisation de `fix` avec `rows` pour répéter le même tableau cible c
 Maintenant je veux fusionner ces 8 matrices décalées, j'utilise `reduce` avec `maximum` et j'appelle le tout `Neighbors` :
 
 ```
-Neighbors = /+≡↻ [
-  [¯1 ¯1] [¯1 0] [¯1 1]
-  [0 ¯1] [1 0]
-  [1 ¯1] [0 1] [1 1]
-] ¤
+Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
+Neighbors = /+ ≡↻ Directions ¤
 
 [0_0_0_0
  0_0_0_0
@@ -130,7 +124,8 @@ Parfait, je peux passer à la suite.
 Mais je suis pris d'un horrible doute :
 
 ```
-Neighbors = /+≡↻ [ [¯1 ¯1] [¯1 0] [¯1 1] [0 ¯1] [1 0] [1 ¯1] [0 1] [1 1] ] ¤
+Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
+Neighbors = /+ ≡↻ Directions ¤
 
 [1_0_0_0
  0_0_0_0
@@ -181,10 +176,8 @@ Voilà, je vais pouvoir utiliser ça dans `Neighbors`.
 ```
 Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
 UnGrow ← ≡(↘2↻¯1)↘2↻¯1
-Neighbors ← /↥≡(UnGrow ↻ ⊙Grow) [
-  [¯1 ¯1] [¯1 0] [¯1 1]
-  [0 ¯1] [1 0]
-  [1 ¯1] [0 1] [1 1]] ¤
+Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
+Neighbors ← /↥≡ (UnGrow ↻ ⊙Grow) Directions ¤
 
 [1_0_0_0
  0_0_0_0
@@ -212,10 +205,8 @@ Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
 UnGrow ← ≡(↘2↻¯1)↘2↻¯1
 Grow ← setund(Grow|Grow|UnGrow)
 
-Neighbors ← /↥≡(⍜Grow (↻:)) : [
-  [¯1 ¯1] [¯1 0] [¯1 1]
-  [0 ¯1] [1 0]
-  [1 ¯1] [0 1] [1 1]] ¤
+Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
+Neighbors ← /↥≡ (⍜Grow (↻:)) : Directions ¤
 
 [1_0_0_0
  0_0_0_0
@@ -230,10 +221,8 @@ J'ai dû permuter les arguments avec `:` pour que `Grow` soit bien appliqué à 
 Bon, après avoir vu d'autres solutions Uiua, j'ai appris qu'il y avait plus simple. Si on modifie `rotate` avec `fill`, alors les lignes ou colonnes décalées ne sont plus reportées de haut en bas ou de droite à gauche, mais un remplissage est fait avec la valeur indiquée. En bref ça fait ce que je voulais :
 
 ```
-Neighbors ← /↥≡⬚0↻ [
-  [¯1 ¯1] [¯1 0] [¯1 1]
-  [0 ¯1] [1 0]
-  [1 ¯1] [0 1] [1 1]] ¤
+Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
+Neighbors ← /↥ ≡⬚0↻ Directions ¤
 
 [1_0_0_0
  0_0_0_0
@@ -311,10 +300,8 @@ Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
 UnGrow ← ≡(↘2↻¯1)↘2↻¯1
 Grow ← setund(Grow|Grow|UnGrow)
 
-Neighbors ← /↥≡(⍜(⊙Grow)↻) [
-  [¯1 ¯1] [¯1 0] [¯1 1]
-  [0 ¯1] [1 0]
-  [1 ¯1] [0 1] [1 1]] ¤
+Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
+Neighbors ← /↥≡ (⍜(⊙Grow)↻) Directions ¤
 
 KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
 
@@ -363,10 +350,8 @@ Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
 UnGrow ← ≡(↘2↻¯1)↘2↻¯1
 Grow ← setund(Grow|Grow|UnGrow)
 
-Neighbors ← /↥≡(⍜(⊙Grow)↻) [
-  [¯1 ¯1] [¯1 0] [¯1 1]
-  [0 ¯1] [1 0]
-  [1 ¯1] [0 1] [1 1]] ¤
+Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
+Neighbors ← /↥ ≡(⍜(⊙Grow)↻) Directions ¤
 
 KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
 
@@ -392,3 +377,259 @@ $ .664.598..
 PartOne
 ```
 
+## Partie 2
+
+On nous demande maintenant de trouver non pas les nombres voisins d'au moins un symbole, mais les symboles `*` voisins d'exactement deux nombres. Et il faut calculer le produit de ces deux nombres pour chaque `*` concerné, puis faire le total sur tout le tableau.
+
+Je devrais pouvoir réutiliser une bonne partie du code de la partie 1. En particulier, je sais déjà répondre à la question "quels sont les nombres qui couvrent au moins une des positions d'un masque.
+
+Donc, en partant d'une matrice comme celle-ci, qui contient un unique symbole `*` :
+
+```no_run
+$ 467..114..
+$ ...*......
+$ ..35..633.
+```
+
+Si j'arrive à construire un masque des cases voisines du `*`, ce que je pourrai probablement faire avec `Neighbors` :
+
+```no_run
+[0_0_1_1_1_0_0_0_0_0_0
+ 0_0_1_0_1_0_0_0_0_0_0
+ 0_0_1_1_1_0_0_0_0_0_0]
+```
+
+Je pourrai appliquer `KeepNumbers` pour identifier que `467` et `35` sont les voisins de ce `*`.
+
+Je commence donc par trouver les `*` dans la matrice, facile. J'appelle ça `FindGears` :
+
+```
+Lines ← ⊕□⍜▽¯:\+.=, @\n
+Parse ← ≡⊔Lines
+FindGears ← =@*
+
+$ 467..114..
+$ ...*......
+$ ..35..633.
+$ ......#...
+$ 617*......
+$ .....+.58.
+$ ..592.....
+$ ......755.
+$ ...$.*....
+$ .664.598..
+
+Parse
+FindGears
+```
+
+D'accord mais là j'ai les emplacements de tous les `*` alors que je veux les traiter un par un. Autrement dit, il faudrait que j'arrive à "éclater"
+
+```no_run
+[0_1_0
+ 0_0_1
+ 1_0_0]
+```
+
+en
+
+```no_run
+[
+  [0_1_0
+   0_0_0
+   0_0_0]
+  [0_0_0
+   0_0_1
+   0_0_0]
+  [0_0_0
+   0_0_0
+   1_0_0]
+]
+```
+
+Je peux commencer par utiliser `where` qui construit une liste des coordonnées des `1` dans une matrice.
+
+```
+[0_1_0
+ 0_0_1
+ 1_0_0]
+⊚
+```
+
+Il faut ensuite que j'arrive à convertir chacune de ces coordonnées en une matrice de la même taille que l'originale, mais avec un `1` dans la cellule en question.
+
+Changer une cellule dans un tableau, c'est quelque chose qui se fait bien avec `under` appliqué à `pick`. En effet `pick` sélectionne une cellule, on la modifie et `under` s'occupe de la réintégrer dans le tableau d'origine.
+
+Par exemple pour doubler la valeur centrale d'une matrice 3x3 :
+
+```
+[1_1_1
+ 1_1_1
+ 1_1_1]
+⍜(⊡ 1_1)(×2)
+```
+
+Pour remplacer une cellule par `1`, je peux utiliser `pop` comme dans `1;` mais j'aime bien aussi utiliser `gap` qui modifie une fonction pour qu'elle enlève le haut de la pile (comme `pop`) avant de s'appliquer (autrement dit, elle ignore son premier argument). Ici la fonction c'est juste `1`, donc ça donne `⋅1` :
+
+```
+0
+⋅1
+```
+
+Note : si je préfère `⋅1` à `1;`, c'est qu'on peut plus souvent se passer de parenthèses en l'écrivant comme ça : en effet l'application d'un modificateur (comme `⋅`) est prioritaire sur la composition de fonctions. Par exemple si j'écris `≡1;` (enlever le haut de la pile, puis répéter la fonction `1` sur les lignes d'un tableau) ça n'a pas le même sens que `≡(1;)` (pour chaque ligne d'un tableau, dépiler puis appeler `1`). Alors que `≡⋅1`, c'est pareil que `≡(⋅1)`.
+
+Et donc dans `under` `pick` ça donne :
+
+```
+[0_0_0
+ 0_0_0
+ 0_0_0]
+⍜(⊡ 1_1)⋅1
+```
+
+On y est presque, il me manque juste une matrice de `0` de la taille de l'originale. Facile, en appliquant `⋅0` à toutes ses cellules :
+```
+[0_1_0
+ 0_0_1
+ 1_0_0]
+∵⋅0
+```
+
+J'applique d'une part le `where` et d'autre part le remplacement par `0`, avec `fork` :
+```
+[0_1_0
+ 0_0_1
+ 1_0_0]
+⊃(⊚|∵⋅0)
+```
+
+Ensuite avec `rows` assorti d'un `fix` (plus exactement `dip` `fix` parce qu'à ce moment-là la matrice de zéros est en deuxième position sur la pile), je transforme chaque coordonnée en une matrice contenant un unique `1`. J'appelle ça `SplitMask`.
+
+```
+SplitMask = ≡(⍜⊡⋅1)⊃(⊚|∵⋅0¤)
+[0_1_0
+ 0_0_1
+ 1_0_0]
+SplitMask
+```
+
+J'ai donc une série de masques correspondant à chacun des symboles `*`.
+
+Étant donné un tel masque je peux construire le masque de ses voisins avec `Neighbors` :
+
+```
+# Experimental!
+Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
+UnGrow ← ≡(↘2↻¯1)↘2↻¯1
+Grow ← setund(Grow|Grow|UnGrow)
+
+Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
+Neighbors ← /↥ ≡(⍜(⊙Grow)↻) Directions ¤
+[0_1_0
+ 0_0_0
+ 0_0_0]
+Neighbors
+```
+
+Avec ce masque de voisins et la matrice d'origine, je peux utiliser `KeepNumbers` sur chaque ligne, comme dans la partie 1.
+
+Sauf que cette fois, je ne veux pas utiliser `fill` pour régler le problème du nombre variable de nombres sur différentes lignes. Je vais plutôt mettre chaque liste en boîte :
+
+```
+KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
+
+["1.."
+ "2.3"
+ "789"]
+
+[1_0_1
+ 1_1_1
+ 0_0_0]
+
+≡(□KeepNumbers)
+```
+
+Et ensuite je rassemble tous ces tableaux contenus dans des boîtes en un seul avec `reduce` `join`. Plus précisément `reduce` `pack` `join`, car le modificateur `pack` permet à `join` de déballer automatiquement les tableaux avant de les concaténer.
+
+```
+[□[1] □[2 3] □[]]
+/⊐⊂
+```
+
+J'appelle cette combinaison `KeepAllNumbers`, parce que je manque d'imagination.
+
+```
+KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
+KeepAllNumbers ← /⊐⊂ ≡(□KeepNumbers)
+
+["1.."
+ "2.3"
+ "789"]
+
+[1_0_1
+ 1_1_1
+ 0_0_0]
+
+KeepAllNumbers
+```
+
+J'ai maintenant une liste des nombres adjacents à un `*` donné. Je peux calculer le produit des nombres s'ils sont deux, avec une `switch function` pour retourner `0` si ce n'est pas le cas. J'appelle ça `GearRatio` :
+
+```
+GearRatio ← (⋅0|/×) =2 ⧻.
+
+GearRatio []
+GearRatio [1]
+GearRatio 2_3
+GearRatio 4_5_6
+```
+
+Il me suffira enfin de faire la somme des produits obtenus pour chaque `*`, avec `reduce` `add`.
+
+Plus qu'à enchaîner tout ça pour obtenir `PartTwo` :
+
+```
+# Experimental!
+
+Lines ← ⊕□⍜▽¯:\+.=, @\n
+Parse ← ≡⊔Lines
+FindGears ← =@*
+SplitMask = ≡(⍜⊡⋅1)⊃(⊚|∵⋅0¤)
+
+Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
+UnGrow ← ≡(↘2↻¯1)↘2↻¯1
+Grow ← setund(Grow|Grow|UnGrow)
+
+Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
+Neighbors ← /↥ ≡(⍜(⊙Grow)↻) Directions ¤
+
+KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
+KeepAllNumbers ← /⊐⊂ ≡(□KeepNumbers)
+
+GearRatio ← (⋅0|/×) =2 ⧻.
+
+PartTwo ← (
+  Parse
+  FindGears .
+  SplitMask
+  ≡(GearRatio KeepAllNumbers Neighbors)⊙¤
+  /+
+)
+
+$ 467..114..
+$ ...*......
+$ ..35..633.
+$ ......#...
+$ 617*......
+$ .....+.58.
+$ ..592.....
+$ ......755.
+$ ...$.*....
+$ .664.598..
+
+PartTwo
+```
+
+Et voilà pour la deuxième partie. Quand je lance ce programme sur mon entrée, qui est une matrice de 140x140 caractères contenant 376 occurrences de `*`, je pense d'abord à un bug parce que rien ne s'affiche. Je finis par comprendre que le calcul est simplement long ! Il se termine quand même en moins de 10 secondes, ce qui m'évite d'avoir à mettre en œuvre des optimisations.
+
+Je me dis que si je voulais accélérer le traitement, je pourrais par exemple traiter l'entrée par bloc de 3 lignes, puisque chaque `*` n'a besoin de considérer que les nombres se trouvant sur sa ligne ou celles adjacentes. Mais il y aurait sûrement quelques subtilités !
