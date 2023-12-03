@@ -5,6 +5,7 @@ Aeq ← ⍤⊃($"expected _ got _")≍
 Parse ← ≡⊔Lines
 
 FindSymbols ← ¬∊: "0123456789."
+FindGears ← =@*
 
 Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
 UnGrow ← ≡(↘2↻¯1)↘2↻¯1
@@ -19,6 +20,18 @@ KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
 
 PartOne ← /+♭⬚0≡KeepNumbers Neighbors FindSymbols .Parse
 
+SplitMask ← ≡(⍜⊡⋅1)⊙¤⊃(⊚|∵⋅0)
+KeepAllNumbers ← /⊐⊂⊐≡KeepNumbers
+GearRatio ← (⋅0|/×) =2 ⧻.
+
+PartTwo ← (
+  Parse
+  FindGears .
+  SplitMask
+  ≡(GearRatio KeepAllNumbers Neighbors)⊙¤
+  /+
+)
+
 ---
 
 $ 467..114..
@@ -32,7 +45,8 @@ $ ......755.
 $ ...$.*....
 $ .664.598..
 
-Aeq 4361 PartOne
+Aeq 4361 PartOne .
+Aeq 467835 PartTwo
 
 $ ....
 $ ....
@@ -102,9 +116,20 @@ $ ....
 
 Aeq 22 PartOne
 
+Aeq 20 GearRatio 5_4
+Aeq 0 GearRatio [5]
+
+$ .45*
+$ ..7.
+$ .*..
+$ .12.
+$ .*..
+
+Aeq 399 PartTwo
+
 &p "Tests OK"
 
 ---
 
 &p PartOne &fras "day3.txt"
-# &p PartTwo &fras "day3.txt"
+&p PartTwo &fras "day3.txt"
