@@ -5,7 +5,6 @@ Aeq ← ⍤⊃($"expected _ got _")≍
 Parse ← ≡⊔Lines
 
 FindSymbols ← ¬∊: "0123456789."
-FindGears ← =@*
 
 Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
 UnGrow ← ≡(↘2↻¯1)↘2↻¯1
@@ -18,8 +17,15 @@ Neighbors ← /↥≡(⍜(⊙Grow)↻) [
 
 KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
 
-PartOne ← /+♭⬚0≡KeepNumbers Neighbors FindSymbols .Parse
+PartOne ← (
+  Parse
+  FindSymbols .
+  Neighbors
+  ⬚0≡KeepNumbers
+  /+♭
+)
 
+FindGears ← =@*
 SplitMask ← ≡(⍜⊡⋅1)⊙¤⊃(⊚|∵⋅0)
 KeepAllNumbers ← /⊐⊂⊐≡KeepNumbers
 GearRatio ← (⋅0|/×) =2 ⧻.
