@@ -38,24 +38,26 @@ Ce n'est que maintenant en le racontant que je réalise que ça ne marche pas co
 
 Bref, une fois que j'ai (à peu près…) isolé la partie droite, je veux la découper selon les points-virgules. Je continue avec `regex`, en isolant les séquences de caractères autres que les points-virgules.
 
+(Note de mise à jour : depuis la version 0.5 de Uiua, la fonction `regex` ne renvoie plus une simple liste mais une matrice dont chaque ligne contient la liste des groupes extraits dans la chaîne. Comme je n'utilise pas de groupes, chaque ligne du résultat aura un seul élément. Je peux donc obtenir la liste des chaînes extraites en utilisant `deshape` pour "aplatir" complètement la matrice de résultat de `regex`. J'ai ajouté ce `deshape` devant toutes les utilisations de `regex` qui suivent).
+
 ```
 $ 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
-regex "[^;]+"
+♭regex "[^;]+"
 ```
 
 Sur chaque groupe isolé ainsi, je découpe à nouveau selon les virgules.
 
 ```
 $ 3 blue, 4 red
-regex "[^,]+"
+♭regex "[^,]+"
 ```
 
 Voici où j'en suis, quand je compose les deux découpages :
 
 ```
 $ 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
-regex "[^;]+"         # on découpe selon les points-virgules
-≡(□regex "[^,]+" ⊔)   # on sous-découpe selon les virgules
+♭regex "[^;]+"         # on découpe selon les points-virgules
+≡(□♭regex "[^,]+" ⊔)   # on sous-découpe selon les virgules
 ```
 
 La composition est polluée par des `unbox` (`regex` met les différentes chaînes trouvées dans des boîtes, toujours pour les faire cohabiter dans un tableau) et les `box`, encore pour constituer un tableau de résultat.
@@ -66,7 +68,7 @@ Mais il faut continuer. Maintenant qu'on a `3 blue` il faut en extraire le nombr
 
 ```
 $ 3 blue
-regex "\\d+ [rgb]"
+♭regex "\\d+ [rgb]"
 ```
 
 Avec `\\d+ [rgb]` je ne conserve que le strict minimum : les chiffres du nombre, et la première lettre de la couleur. C'est ici que je me débarrasse donc d'un éventuel espace superflu, ainsi que (à mon insu) du `:` qui avait survécu à ma suppression des 8 premiers caractères de la ligne plus haut.
@@ -95,10 +97,10 @@ OK, maintenant on sait transformer la chaîne représentant un tour du jeu (`3 b
 
 ```
 $ 3 blue, 4 red
-regex "[^,]+"         # on découpe selon les virgules
+♭regex "[^,]+"         # on découpe selon les virgules
 ≡(                    # et pour chaque groupe…
   ⊔                   # on ouvre la boîte
-  regex "\\d+ [rgb]"  # on ne conserve que le nombre et la première lettre
+  ♭regex "\\d+ [rgb]"  # on ne conserve que le nombre et la première lettre
   ⊔⊢                  # on prend la première chaîne trouvée par regex, on la déballe
   { ⊃(⊢⇌|parse⇌↘2⇌) } # on extrait la lettre, et le nombre
 )
@@ -137,11 +139,13 @@ Bon, il faut bien sûr faire la même chose avec `g` et `b`, c'est un travail po
 
 C'est atroce mais au moins on a le résultat souhaité. Je nomme cette fonction `ExtractRGB` et je décide de ne plus jamais la regarder.
 
+(Note de mise à jour : depuis la version 0.5, Uiua signale quand une ligne est trop longue. Je suis complètement d'accord avec le compilateur, cette ligne est trop longue. Depuis, j'ai appris à découper les fonctions sur plusieurs lignes, et accessoirement à ne pas en faire d'aussi alambiquées. Mais je laisse le _warning_ ici et pour toutes les occurrences de `ExtractRGB` ci-dessous pour boire toute ma honte).
+
 On peut maintenant combiner tout ça pour analyser une partie, j'appelle ça `ParseGame` :
 
 ```
 ExtractRGB ← [⊃(⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@g)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@b)(⋅⋅⋅0))≡(⊔⊢⊔).]
-ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢regex "\\d+ [rgb]"⊔)regex "[^,]+" ⊔)regex "[^;]+" ↘8
+ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢♭regex "\\d+ [rgb]"⊔)♭regex "[^,]+" ⊔)♭regex "[^;]+" ↘8
 
 $ Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 ParseGame
@@ -188,7 +192,7 @@ On y est presque pour la partie 1. Je sais déterminer si une partie est possibl
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
 ExtractRGB ← [⊃(⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@g)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@b)(⋅⋅⋅0))≡(⊔⊢⊔).]
-ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢regex "\\d+ [rgb]"⊔)regex "[^,]+" ⊔)regex "[^;]+" ↘8
+ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢♭regex "\\d+ [rgb]"⊔)♭regex "[^,]+" ⊔)♭regex "[^;]+" ↘8
 Parse ← ≡(□ ParseGame ⊔) Lines
 IsPossible ← /↧♭≡(≤12_13_14)
 
@@ -224,7 +228,7 @@ Il ne reste qu'à faire la somme avec encore un `reduce` appliqué à `add`, et 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
 ExtractRGB ← [⊃(⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@g)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@b)(⋅⋅⋅0))≡(⊔⊢⊔).]
-ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢regex "\\d+ [rgb]"⊔)regex "[^,]+" ⊔)regex "[^;]+" ↘8
+ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢♭regex "\\d+ [rgb]"⊔)♭regex "[^,]+" ⊔)♭regex "[^;]+" ↘8
 Parse ← ≡(□ ParseGame ⊔) Lines
 IsPossible ← /↧♭≡(≤12_13_14)
 
@@ -236,7 +240,7 @@ $ Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 $ Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 $ Game 100: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 
-PartOne
+⍤⊃⋅∘≍ 8 . PartOne
 ```
 
 Pfouh. Je croise les doigts pour que la deuxième partie ne nécessite pas de modifier `Parse`.
@@ -268,7 +272,7 @@ La partie 2 s'exprime donc plus simplement que la partie 1, finalement :
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
 ExtractRGB ← [⊃(⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@g)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@b)(⋅⋅⋅0))≡(⊔⊢⊔).]
-ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢regex "\\d+ [rgb]"⊔)regex "[^,]+" ⊔)regex "[^;]+" ↘8
+ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢♭regex "\\d+ [rgb]"⊔)♭regex "[^,]+" ⊔)♭regex "[^;]+" ↘8
 Parse ← ≡(□ ParseGame ⊔) Lines
 
 GamePower ← /×/↥
@@ -281,6 +285,6 @@ $ Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 $ Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 $ Game 100: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 
-PartTwo
+⍤⊃⋅∘≍ 2286 . PartTwo
 ```
 

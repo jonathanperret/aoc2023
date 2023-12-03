@@ -374,7 +374,7 @@ $ ......755.
 $ ...$.*....
 $ .664.598..
 
-PartOne
+⍤⊃⋅∘≍ 4361 . PartOne
 ```
 
 ## Partie 2
@@ -469,7 +469,7 @@ Par exemple pour doubler la valeur centrale d'une matrice 3x3 :
 ⍜(⊡ 1_1)(×2)
 ```
 
-Pour remplacer une cellule par `1`, je peux utiliser `pop` comme dans `1;` mais j'aime bien aussi utiliser `gap` qui modifie une fonction pour qu'elle enlève le haut de la pile (comme `pop`) avant de s'appliquer (autrement dit, elle ignore son premier argument). Ici la fonction c'est juste `1`, donc ça donne `⋅1` :
+Pour remplacer une cellule par `1`, je peux utiliser `pop` comme ceci : `1;` mais j'aime bien aussi utiliser `gap` qui modifie une fonction pour qu'elle enlève le haut de la pile (comme `pop`) avant de s'appliquer (autrement dit, elle ignore son premier argument). Ici la fonction c'est juste `1`, donc ça donne `⋅1` :
 
 ```
 0
@@ -573,7 +573,7 @@ KeepAllNumbers ← /⊐⊂ ≡(□KeepNumbers)
 KeepAllNumbers
 ```
 
-J'ai maintenant une liste des nombres adjacents à un `*` donné. Je peux calculer le produit des nombres s'ils sont deux, avec une `switch function` pour retourner `0` si ce n'est pas le cas. J'appelle ça `GearRatio` :
+J'ai maintenant une liste des nombres adjacents à un `*` donné. Je peux calculer le produit des nombres s'ils sont deux, avec une _switch function_ pour retourner `0` si ce n'est pas le cas. J'appelle ça `GearRatio` :
 
 ```
 GearRatio ← (⋅0|/×) =2 ⧻.
@@ -627,7 +627,7 @@ $ ......755.
 $ ...$.*....
 $ .664.598..
 
-PartTwo
+⍤⊃⋅∘≍ 467835 . PartTwo
 ```
 
 Et voilà pour la deuxième partie. Quand je lance ce programme sur mon entrée, qui est une matrice de 140x140 caractères contenant 376 occurrences de `*`, je pense d'abord à un bug parce que rien ne s'affiche. Je finis par comprendre que le calcul est simplement long ! Il se termine quand même en moins de 10 secondes, ce qui m'évite d'avoir à mettre en œuvre des optimisations.

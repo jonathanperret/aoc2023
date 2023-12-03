@@ -1,19 +1,43 @@
 Lines ← &i "tools.ua" "Lines"
 Aeq ← ⍤⊃($"expected _ got _")≍
 
-ExtractRGB ← /↥≡(×⊃(="rgb"⊢|⊡1)⊔)
-ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢regex "\\d+ [rgb]"⊔)regex "[^,]+" ⊔)regex "[^;]+" ↘8
+ExtractRGB ← (
+  ≡(
+    ×⊃(⊔="rgb"⊔⊢|⊔⊡1)
+  )
+  /↥
+)
+ParseRound ← (
+  ♭ regex "\\d+ [rgb]"
+  ≡({⊃(⊢⇌|parse⇌↘2⇌⊔)})
+  ExtractRGB
+)
+ParseGame ← (
+  ♭ regex "[^;]+" ↘8
+  ≡ParseRound
+)
 Parse ← ≡(□ ParseGame ⊔) Lines
 
 IsPossible ← /↧♭≡(≤12_13_14)
-PartOne ← /+▽:+1⇡⧻.≡(IsPossible ⊔) Parse
+PartOne ← (
+  Parse
+  ≡(IsPossible ⊔)
+  ▽:+1⇡⧻.
+  /+
+)
 
 GamePower ← /×/↥
 PartTwo ← /+≡(GamePower ⊔) Parse
 
 ---
-Aeq 5_3_30 ExtractRGB {{@b 30} {@g 3} {@r 5}}
-Aeq 0_3_30 ExtractRGB {{@b 30} {@g 3}}
+Aeq 5_3_30 ExtractRGB [{@b 30} {@g 3} {@r 5}]
+Aeq 0_3_30 ExtractRGB [{@b 30} {@g 3}]
+
+$ 3 blue, 4 red
+Aeq 4_0_3 ParseRound
+
+$ Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Aeq [4_0_3 1_2_6 0_2_0] ParseGame
 
 Aeq 0 IsPossible[3_4_0 13_12_10 1_3_4]
 Aeq 1 IsPossible[4_4_0 12_12_10 1_3_4]
@@ -35,5 +59,5 @@ Aeq 2286 PartTwo
 
 ---
 
-&p PartOne &fras "day2.txt"
-&p PartTwo &fras "day2.txt"
+Aeq 3059 PartOne &fras "day2.txt"
+Aeq 65371 PartTwo &fras "day2.txt"

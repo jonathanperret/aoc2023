@@ -33,10 +33,10 @@ En appliquant `≥@0` j'obtiens un masque des caractères plus grands que `0` da
 $ 1abc2
 ≥@0 .
 ```
-Et en appliquant `<=@9` un masque de ceux qui viennent avant `9` :
+Et en appliquant `≤@9` un masque de ceux qui viennent avant `9` :
 ```
 $ 1abc2
-<=@9 .
+≤@9 .
 ```
 
 (à la réflexion j'aurais pu me contenter de ce dernier test, car il me semble qu'aucun caractère dans l'entrée n'est plus petit que `0` !)
@@ -49,7 +49,7 @@ $ 1abc2
 ⊃(≥@0|≤@9) # on teste chaque caractère par rapport à 0 et 9
 ```
 
-Il faut ensuite combiner les deux masques avec un `ET` logique. Cet opérateur n'existe pas tel quel en Uiua mais comme les booléens sont représentés par `0` et `1` il suffit d'appliquer `minimum` ou encore `multiply` pour obtenier l'effet souhaité.
+Il faut ensuite combiner les deux masques avec un `ET` logique. Cet opérateur n'existe pas tel quel en Uiua mais comme les booléens sont représentés par `0` et `1` il suffit d'appliquer `minimum` ou encore `multiply` pour obtenir l'effet souhaité.
 
 ```
 $ 1abc2
@@ -66,7 +66,7 @@ $ 1abc2
 ▽             # on ne garde que les chiffres
 ```
 
-Maintenant que j'ai isolé les chiffres, je ne veux garder que le premier, qu'on peut obtenir avec `first`, et le dernier qu'on obtient en appliquant `reverse` avant `first`, soit `⊢⇌`. Je vais encore utiliser `fork`, donc `⊃(⊢|⊢⇌)` :
+Maintenant que j'ai isolé les chiffres, je ne veux garder que le premier, qu'on peut obtenir avec `first`, et le dernier qu'on obtient en appliquant `reverse` avant `first`, soit `⊢⇌`. Je vais encore utiliser `fork` :
 
 ```
 $ 12345
@@ -119,7 +119,7 @@ $ pqr3stu8vwx
 $ a1b2c3d4e5f
 $ treb7uchet
 
-PartOne
+⍤⊃⋅∘≍ 142 . PartOne
 ```
 
 ## Partie 2
@@ -128,9 +128,11 @@ Ah, il faut maintenant reconnaître les chiffres écrits en toutes lettres. Donc
 
 Même si ce n'est pas un problème très compliqué de reconnaissance de chaînes, je décide d'utiliser `regex` plutôt que de chercher les chiffres "manuellement".
 
+(Note de mise à jour : depuis la version 0.5 de Uiua, la fonction `regex` ne renvoie plus une simple liste mais une matrice dont chaque ligne contient la liste des groupes extraits dans la chaîne. Comme je n'utilise pas de groupes, chaque ligne du résultat aura un seul élément. Je peux donc obtenir la liste des chaînes extraites en utilisant `deshape` pour "aplatir" complètement la matrice de résultat de `regex`. J'ai ajouté ce `deshape` devant toutes les utilisations de `regex` qui suivent).
+
 ```
 $ two1nine
-regex "0|1|2|3|4|5|6|7|8|9|one|two|three|four|five|six|seven|eight|nine"
+♭ regex "0|1|2|3|4|5|6|7|8|9|one|two|three|four|five|six|seven|eight|nine"
 ```
 
 Ça fonctionne pour isoler les chiffres écrits en toutes lettres. Mais il me reste à faire la correspondance entre `one` et `1`, `two` et `2`, etc.
@@ -202,7 +204,7 @@ Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
           "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
 DigitRE ← /⊐$"_|_" Digits
 
-PartTwoLine ← parse +@0≡((∘|-9)>9. indexof : Digits)⊟⊃(⊢|⊢⇌)regex DigitRE ⊔
+PartTwoLine ← parse +@0≡((∘|-9)>9. indexof : Digits)⊟⊃(⊢|⊢⇌)♭regex DigitRE ⊔
 PartTwo ← /+≡PartTwoLine Lines
 
 $ two1nine
@@ -213,7 +215,7 @@ $ 4nineeightseven2
 $ zoneight234
 $ 7pqrstsixteen
 
-PartTwo
+⍤⊃⋅∘≍ 281 . PartTwo
 ```
 
 Super, ça marche sur l'exemple. C'est fini du coup ?
@@ -227,13 +229,13 @@ Puis je réfléchis au piège qui pourrait avoir été glissé. Est-ce qu'un chi
 Je décide de continuer à utiliser `regex` mais il faut que j'arrive à lire la chaîne de droite à gauche. En réfléchissant un peu, retourner l'expression régulière et l'appliquer sur une chaîne retournée devrait me donner ce que je cherche :
 
 ```
-regex ⇌"0|1|2|one|four|seven|eight|nine" ⇌"2fourseven1oneights"
+♭regex ⇌"0|1|2|one|four|seven|eight|nine" ⇌"2fourseven1oneights"
 ```
 
 Il faut bien sûr retourner chacune des chaînes extraites aussi :
 
 ```
-≡⇌ regex ⇌"0|1|2|one|four|seven|eight|nine" ⇌"2fourseven1oneights"
+≡⇌ ♭regex ⇌"0|1|2|one|four|seven|eight|nine" ⇌"2fourseven1oneights"
 ```
 
 On retrouve bien notre `eight` en première position !
@@ -241,21 +243,21 @@ On retrouve bien notre `eight` en première position !
 J'appelle `Xeger` cette fonction qui applique `regex` à l'envers :
 
 ```
-Xeger ← ≡⇌ regex ∩⇌
+Xeger ← ≡⇌ ♭regex ∩⇌
 Xeger "0|1|2|one|four|seven|eight|nine" "2fourseven1oneights"
 ```
 
 J'ai utilisé `both` pour appliquer `reverse` à chacun des deux arguments de la fonction.
 
-Je remplace donc `⊃(⊢|⊢⇌)regex DigitRE` par `⊃(⊢regex DigitRE|⊢Xeger DigitRE)` dans ma fonction `PartTwoLine`.
+Je remplace donc `⊃(⊢|⊢⇌)♭regex DigitRE` par `⊃(⊢♭regex DigitRE|⊢Xeger DigitRE)` dans ma fonction `PartTwoLine`.
 
 ```
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
           "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
 DigitRE ← /⊐$"_|_" Digits
-Xeger ← ≡⇌ regex ∩⇌
+Xeger ← ≡⇌ ♭regex ∩⇌
 
-PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢regex DigitRE|⊢Xeger DigitRE)⊔
+PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢♭regex DigitRE|⊢Xeger DigitRE)⊔
 
 PartTwoLine "2fourseven1oneights"
 ```
@@ -268,9 +270,9 @@ Lines ← ⊕□⍜▽¯:\+.=, @\n
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
           "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
 DigitRE ← /⊐$"_|_" Digits
-Xeger ← ≡⇌ regex ∩⇌
+Xeger ← ≡⇌ ♭regex ∩⇌
 
-PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢regex DigitRE|⊢Xeger DigitRE)
+PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢♭regex DigitRE|⊢Xeger DigitRE)
 PartTwo ← /+≡(PartTwoLine ⊔) Lines
 
 $ two1nine
@@ -281,6 +283,6 @@ $ 4nineeightseven2
 $ zoneight234
 $ 7pqrstsixteen
 
-PartTwo
+⍤⊃⋅∘≍ 281 . PartTwo
 ```
 

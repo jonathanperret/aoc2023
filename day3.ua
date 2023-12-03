@@ -135,5 +135,5 @@ Aeq 399 PartTwo
 
 ---
 
-&p PartOne &fras "day3.txt"
-&p PartTwo &fras "day3.txt"
+Aeq 535351 PartOne &fras "day3.txt"
+Aeq 87287096 PartTwo &fras "day3.txt"

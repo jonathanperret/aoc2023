@@ -7,9 +7,17 @@ PartOne ← /+≡(PartOneLine ⊔)Lines
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
           "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
 DigitRE ← ⊐/⊂↘1♭≡⊂ "|"Digits
-Xeger ← ≡⇌regex ∩⇌
+Xeger ← ≡⇌♭regex ∩⇌
 
-PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢regex DigitRE|⊢Xeger DigitRE)⊔
+PartTwoLine ← (
+  ⊔
+  ⊟⊃(
+    ⊢♭regex DigitRE
+  | ⊢Xeger DigitRE
+  )
+  +@0≡((∘|-9)>9. ⊗ : Digits)
+  parse
+)
 PartTwo ← /+≡PartTwoLine Lines
 
 ---
@@ -40,5 +48,5 @@ Aeq 68 PartTwoLine "6oneighthlf"
 
 ---
 
-&p PartOne &fras "day1.txt"
-&p PartTwo &fras "day1.txt"
+Aeq 55090 PartOne &fras "day1.txt"
+Aeq 54845 PartTwo &fras "day1.txt"
