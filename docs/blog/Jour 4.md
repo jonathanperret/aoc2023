@@ -25,11 +25,11 @@ C'est parti pour la lecture des lignes.
 
 ```
 ParseCard ← (
-  ↘+1⊗@:.
-  ≠@|.
+  ↘+1⊗@:. # on enlève les caractères jusqu'au ":"
+  ≠@|.    # on détecte ce qui n'est pas "|"
   ⊜(
-    ⊜parse ≠@\s.
-    □
+    ⊜parse ≠@\s. # on lit les séquences de chiffres
+    □            # qu'on met en boîte pour cohabiter
   )
 )
 
