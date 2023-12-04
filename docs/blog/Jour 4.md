@@ -19,7 +19,7 @@ $ Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
 $ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 ```
 
-Sur chaque carte, à gauche on a une liste des numéros gagnants, et à droite les numéros joués. La valeur d'une carte est 2 à la puissance (nombre de "bons" numéros moins 1).
+Sur chaque carte, à gauche on a une liste des numéros gagnants, et à droite les numéros joués. La valeur d'une carte est 2^[nombre de "bons" numéros moins 1].
 
 C'est parti pour la lecture des lignes.
 
@@ -64,14 +64,16 @@ $ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 Parse
 ```
 
-OK, maintenant il faut faire correspondre la droite avec la gauche.
+OK, maintenant il faut faire correspondre la droite avec la gauche, j'utilise `member`.
 
 ```
 ScoreCard ← (
-  ⊃(⊔⊡1|⊔⊢)
-  ≡∊ ⊙¤
-  -1/+
-  ⁿ:2
+  ⊃(⊔⊡1|⊔⊢) # on sort les deux tableaux de leurs boîtes
+  ⊙¤        # on "fixe" le tableau de droite pour qu'il soit constant
+  ≡∊        # …pendant l'itération sur le tableau de gauche
+  /+        # on additionne pour savoir combien sont trouvés
+  -1        # hop, moins un
+  ⁿ:2       # et 2^x (avec un `: flip` pour ne pas faire x^2)
 )
 
 {41_48_83_86_17 83_86_6_31_17_9_48_53}
