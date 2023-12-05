@@ -156,6 +156,8 @@ ApplyRange 99 [50 98 2]
 Voici `ApplyTable` :
 
 ```
+FindRange ← ⊢ ▽: ⊙≡(≤ ⊙- ⊃(⊡2|⊡1)) . : ¤
+ApplyRange ← + -: ⊙⊃(⊡1|⊢)
 ApplyTable ← (
   # 99 [52_50_48 50_98_2]
   .          # 99 99 [52_50_48 50_98_2]
@@ -169,6 +171,9 @@ ApplyTable 99 [52_50_48 50_98_2]
 Et pour finir `ApplyTables` :
 
 ```
+FindRange ← ⊢ ▽: ⊙≡(≤ ⊙- ⊃(⊡2|⊡1)) . : ¤
+ApplyRange ← + -: ⊙⊃(⊡1|⊢)
+ApplyTable ← ApplyRange ⊙FindRange .
 ApplyTables ← (
   # 99 {[52_50_48 50_98_2] [0_10_200]}
   :
