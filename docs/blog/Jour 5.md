@@ -349,4 +349,359 @@ C'était long quand même pour une première partie. Voyons la suite.
 
 ## Partie 2
 
+Ouille. Maintenant il faut interpréter la liste des graines au début, `79 14 55 13`, doit être interprétée comme une liste d'intervalles, soit `14` valeurs en partant de `79` puis `13` valeurs en partant de `55`. Dans l'exemple, cela fait donc `27` valeurs de graine à tester.
 
+Et la question reste la même, quel est la valeur la plus petite atteinte par une de ces graines.
+
+A priori il est très facile de construire la liste des graines à partir de ces intervalles. Mais autant transformer 27 nombres à travers les tables est simple, autant si je regarde mon entrée… rien que le premier intervalle de graines est `364807853 408612163`,  soit un peu plus de 43 millions de valeurs !
+
+Clairement, il faut trouver une stratégie moins naïve.
+
+Plusieurs idées me viennent en tête, qui pourraient éventuellement se combiner :
+* Appliquer les tables non plus à des valeurs individuelles mais à des intervalles.
+* Combiner plusieurs tables en une seule.
+* Partir de la dernière table et remonter ?
+
+Pour cette première piste de transformation d'intervalles, la difficulté que je vois est qu'un intervalle transformé par une table ne reste pas nécessairement un intervalle, mais plutôt une collection d'intervalles. Qui ne seront même pas nécessairement disjoints d'ailleurs — il faudrait potentiellement en fusionner certains.
+
+### Une représentation compacte des collections d'intervalles ?
+
+Ça me fait repenser à mon idée abandonnée plus tôt de représentation alternative pour une collection d'intervalles : une liste de bornes, associées chacune à une information valable à partir de cette borne, par exemple "dedans/dehors".
+
+Par exemple à partir de la paire d'intervalles `79,14 55,13` on construirait la liste `0 55 68 79 93` associée à la liste `0_1_0_1_0` qui s'interpréterait ainsi : à partir de `55`, on est "dedans" (`1`), mais à partir de `68` on est "dehors" (`0`), et ainsi de suite.
+
+Pour représenter une table de correspondance, au lieu d'associer des valeurs `0` et `1` pour "dehors" et "dedans" on pourrait stocker le décalage à appliquer. Donc par exemple cette table :
+
+```no_run
+[52_50_48 50_98_2]
+```
+
+Deviendrait cette paire de listes :
+
+```no_run
+[ 0 50  98 100 ]
+[ 0  2 ¯48   0 ]
+```
+
+Je me dis qu'une telle représentation simplifierait peut-être les opérations de comparaison et de fusion d'intervalles que je vais avoir à faire.
+
+Je garde cette idée au chaud, mais pour l'instant j'ai envie de faire une petite évaluation du volume de données à potentiellement traiter.
+
+### Il est gros comment le problème au juste ?
+
+Je commence par regarder combien de lignes chaque table possède avec :
+
+```no_run
+≡⧻;Parse &fras "day5.txt"
+# [24 31 10 27 11 13 8]
+```
+
+Supposons que je commence avec un intervalle suffisamment grand pour contenir tous les intervalles de la première table. Celle-ci contient `24` lignes dans mon entrée. Mon intervalle de départ pourrait donc se transformer en un maximum de `24` nouveaux intervalles.
+
+Pour chacun de ceux-ci, la deuxième table qui a `31` lignes pourrait donc en introduire `31` nouveaux. Et ainsi de suite.
+
+Or, le produit des tailles des tables est quand même `229806720` ! Bien sûr, j'ai peu de chances d'arriver à ce cas qui est le pire, mais ça fait réfléchir quand même.
+
+Est-ce que je pourrais purger la liste des intervalles au fur et à mesure ? Certains se fusionneront certainement, mais je n'ai aucune garantie que cela réduise suffisamment le nombre d'intervalles à conserver. Et je ne peux pas simplement ignorer les intervalles "élevés" sous prétexte que je cherche le minimum à la fin, puisqu'un intervalle "élevé" peut très bien être ramené à plus petit par une table suivante.
+
+Ce calcul me fait réaliser aussi que fusionner les tables de correspondance ne serait probablement pas une bonne idée, la table résultante serait énorme.
+
+Il ne me reste donc qu'une seule idée à explorer : peut-on prendre le problème "à l'envers", c'est-à-dire en cherchant pour une table donnée quels intervalles donneraient les plus petites valeurs possibles en sortie ?
+
+Si je reprends l'exemple, voici la dernière table :
+
+```no_run
+$ humidity-to-location map:
+$ 60 56 37
+$ 56 93 4
+```
+
+Je vais faire une hypothèse qui n'est pas explicite dans l'énoncé mais qui me paraît raisonnable : tous les nombres que l'on manipule sont des entiers non négatifs.
+
+La plus petite valeur que je puisse espérer obtenir est donc `0`.
+
+Si par exemple je voulais obtenir `0` en sortie de la table ci-dessus, que faudrait-il passer en entrée ?
+
+`0` lui-même se transformera en `0` puisqu'il n'appartient à aucun des intervalles mentionnés. Mais d'autres valeurs peuvent-elles mener à `0` ? Non, car le premier intervalle (`60 56 37`) ajoute `4` (`60 - 56`) aux valeurs comprises entre `56` et `56 + 37`. Et le deuxième (`56 93 4`) enlève `37` (`93 - 56`) aux valeurs entre `93` et `93 + 4`.
+
+Toutes les valeurs inférieures à `56` ne peuvent être obtenues que par identité. Mais `56` peut aussi être obtenu en passant `93`.
+
+Je pourrais commencer par un intervalle pour lequel j'espère trouver une graine source, par exemple `0…55`, faire la transformation inverse qui me donnerait les intervalles sources susceptibles de générer une valeur dans cet intervalle, et remonter la liste des tables ainsi. Mais comme remonter chaque table va multiplier le nombre d'intervalles à suivre, j'aurai le même problème qu'en prenant le problème "à l'endroit" ! Hmm.
+
+### Quelques particularités des données d'entrée
+
+Tiens, une observation intéressante : dans l'entrée complète, chaque table ne contient que des intervalles d'entrée consécutifs. Et à l'exception de la dernière table, il y a toujours un intervalle qui commence à zéro.
+
+Les intervalles de sortie sont également consécutifs !
+
+### Compression d'intervalles : un nouvel espoir ?
+
+Je continue de chercher. À un moment, je crois avoir trouvé la solution : si j'arrive à énumérer tous les "points" auxquels des intervalles peuvent être coupés, je pourrai "compresser" les intervalles en ne gardant qu'un seul élément comme représentant de chacun de ces intervalles, ce qui me permettrait de réutiliser le code de la partie 1 puisqu'il n'y aurait plus qu'un petit nombre d'éléments à tester.
+
+Je crois tellement à cette piste que j'écris une implémentation complète, qui commence par calculer tous les points de rupture possibles en cherchant le début et la fin de tous les intervalles dans les données en entrée. Puis je trie ces points (il y en a environ 250) et je les renumérote de façon à avoir le même problème mais avec des nombres qui vont de 0 à 250 au lieu d'aller de 0 à quelques milliards, ce qui rend une énumération des graines tout à fait faisable. Je suis assez content de cette implémentation et je soumets la réponse qu'elle me donne… qui est fausse, malheureusement.
+
+### Pause
+
+Après une longue pause avec entre les mains un guidon au lieu d'un clavier, je m'y remets. Pendant cette pause j'ai encore réfléchi, bien sûr.
+
+J'ai compris déjà pourquoi mon idée de compression des intervalles ne fonctionnait pas. Les points que j'avais énuméré dans l'entrée ne suffisent pas , car ils vont être transformés et se multiplier au fil du passage par les différentes tables de conversion. Bref, mauvaise piste.
+
+L'illumination qui m'est venue en fin de trajet, c'est que j'ai largement surestimé le nombre d'intervalles que je devrais manipuler si j'appliquais "simplement" les tables pour les transformer. Oui, appliquer une table découpant l'entrée en 10 intervalles peut transformer un intervalle en 10 intervalles. Mais dans l'hypothèse où la collection d'intervalles en entrée ne contient pas de recouvrement (ce que j'ai constaté dans l'entrée, mais que j'aurais pu sinon garantir en fusionnant les intervalles se recouvrant entre chaque application de table), une table à 10 lignes ne va pas multiplier par 10 le nombre d'intervalles de la collection à laquelle elle est appliquée ! Plus précisément, si une table découpe la ligne des réels en 10 parties, elle ne peut ajouter qu'un maximum de 10 intervalles à cette collection.
+
+Une façon imagée de le voir est avec un cake : si j'ai découpé un cake en 3 parts, chaque coup de couteau supplémentaire (tant qu'ils sont parallèles, on n'est pas chez les sauvages) ne peut ajouter qu'une part.
+
+Bref, au lieu de m'inquiéter j'aurais mieux fait de partir directement sur la solution avec les intervalles. Comme quoi il est possible de trop réfléchir.
+
+### Et c'est reparti
+
+Maintenant que je suis confiant sur le fait que j'ai la bonne piste, il ne reste plus qu'à coder des intersections d'intervalles en Uiua…
+
+À ce stade, je n'ai plus trop l'énergie pour détailler l'écriture de cette implémentation, donc désolé, voici juste le résultat :
+
+```
+Lines ← ⊕□⍜▽¯:\+.=, @\n
+
+ParseSeeds ← (
+  ⊔
+  ↘+2⊗@:.
+  ⊜parse≠@\s.
+)
+ParseMap ← (
+  ⊔
+  ↘1
+  ≡(⊜parse ≠@\s. ⊔)
+  □
+)
+ParseMaps ← (
+  ≠0≡⧻.
+  ⊜□
+  ≡ParseMap
+)
+Parse ← (
+  Lines
+  ⊃(
+    ⊢
+    ParseSeeds
+  | ↘2
+    ParseMaps
+  )
+)
+
+LeftSegment ← (
+  ⊃(
+    ⊢ # start of left ⇡
+  | ⊓(
+      /+ # end of left ⇡
+    | ⊡1 # start of right ⇡
+    )
+    ↧ # end of left segment = leftmost
+  )
+  ⊙-. # compute ⧻ from start and end
+  ⊟   # build left segment
+)
+MiddleSegment ← (
+  # 40_20 52_50_48
+  ⊃(
+    ⊓(
+      ⊢  # start of left ⇡
+    | ⊡1 # start of right ⇡
+    )
+    ↥ # start of middle = rightmost start
+  | ⊓(
+      /+   # end of left ⇡
+    | /+↘1 # end of right ⇡
+    )
+    ↧ # end of middle = leftmost end
+  | ;
+    - ⊃(⊡1|⊢) # offset of right ⇡
+  )
+  -,: # ⧻ of middle from start to end
+  ⊟:  # build source middle segment
+  ⍜⊢+ # apply offset to middle segment
+)
+RightSegment ← (
+  # 80_20 52_50_40 -> 90_10
+  ⊃(
+    /+ # end of left ⇡ (100)
+  | ⊓(
+      ⊢    # start of left ⇡ (80)
+    | /+↘1 # end of right ⇡ (90)
+    )
+    ↥ # start of right segment = rightmost (90)
+  )
+  -, # ⧻ of right segment
+  ⊟: # build right segment
+)
+
+ValidRange ← (
+  ⊡1
+  >0
+)
+
+ApplyRangeToRange ← (
+  # 40_20 52_50_48 -> [ 40_10 ] [ 52_10 ]
+
+  ⊃(
+    ⊟⊃(LeftSegment|RightSegment)
+  | ¤ MiddleSegment
+  )
+
+  # filter out invalid ranges
+  ∩(
+    ▽ ≡ValidRange .
+  )
+)
+
+ApplyTableToRangeStep ← (|3.2
+  # on the stack: ⇡ to apply, and accumulators: ranges to process, transformed ranges
+  ¤
+  ≡(
+    :
+    ApplyRangeToRange
+    ∩□
+  )
+  ∩(∧(⊂⊔)⊙(↯0_2[]))
+  ⊙⊂
+)
+
+ConvertSeeds ← ↯¯1_2
+SortRanges ← ⊏⍏≡⊢.
+JoinBoxed ← ∧(⊂⊔)⊙(↯0_2[])
+
+ApplyTableToRange ← (
+  :
+  ⊙(
+    ¤
+    ⊙(↯0_2[])
+  )
+  ∧ApplyTableToRangeStep
+  # on the stack: untransformed ranges, transformed ranges
+  # merge transformed ranges with untransformed ones
+  ⊂
+)
+ApplyTableToRanges ← (
+  ⊙¤
+  ≡(□ApplyTableToRange)
+  JoinBoxed
+  SortRanges
+)
+
+ApplyTablesToRanges ← (
+  ∧(|2
+    ⊔
+    :
+    ApplyTableToRanges
+  )
+)
+
+PartTwo ← (
+  Parse
+  ConvertSeeds
+  :
+  ApplyTablesToRanges
+  ⊡ 0_0
+)
+
+$ seeds: 79 14 55 13
+$
+$ seed-to-soil map:
+$ 52 50 48
+$ 50 98 2
+$
+$ soil-to-fertilizer map:
+$ 0 15 37
+$ 37 52 2
+$ 39 0 15
+$
+$ fertilizer-to-water map:
+$ 49 53 8
+$ 0 11 42
+$ 42 0 7
+$ 57 7 4
+$
+$ water-to-light map:
+$ 88 18 7
+$ 18 25 70
+$
+$ light-to-temperature map:
+$ 45 77 23
+$ 81 45 19
+$ 68 64 13
+$
+$ temperature-to-humidity map:
+$ 0 69 1
+$ 1 0 69
+$
+$ humidity-to-location map:
+$ 60 56 37
+$ 56 93 4
+
+⍤⊃⋅∘≍ 46 PartTwo
+```
+
+Avec des tests unitaires sur chacune des petites fonctions, le code n'a pas été trop difficile à écrire malgré certaines manipulations de pile un peu compliquées. J'ai vu ensuite des implémentations Uiua d'intersections d'intervalles bien plus élégantes, notamment en améliorant la représentation des intervalles.
+
+Par curiosité (et pour pouvoir plus facilement partager ma solution) j'ai voulu voir à quoi elle ressemblerait sous une forme plus compacte, ça donne ceci :
+
+```
+Lines ← ⊕□⍜▽¯:\+.=, @\n
+
+ParseSeeds ← ⊜parse≠@\s. ↘+2⊗@:. ⊔
+ParseMap ← □ ≡(⊜parse ≠@\s. ⊔) ↘1
+ParseMaps ← ⊜ParseMap ≠0≡⧻.
+Parse ← ⊃(ParseSeeds ⊢|ParseMaps ↘2) Lines
+
+LeftSegment ← ⊟ ⊙-. ⊃(⊢|↧ ⊓(/+|⊡1))
+MiddleSegment ← ⍜⊢+ ⊟:-,: ⊃(↥ ⊓(⊢|⊡1)|↧ ∩/+⊙(↘1)|- ⊃(⊡1|⊢) ;)
+RightSegment ← ⊟: -, ⊃(/+|↥ ⊓(⊢|/+↘1))
+
+ApplyRangeToRange ← ∩(▽ >0 ⊃(≡⊡1)∘) ⊃(⊟⊃(LeftSegment|RightSegment)|¤ MiddleSegment)
+ApplyTableToRangeStep ← |3.2 ⊙⊂ ∩(∧(⊂⊔)⊙(↯0_2[])) ≡(∩□ ApplyRangeToRange :) ¤
+
+ApplyTableToRange ← ⊂ ∧ApplyTableToRangeStep ⊙(⊙(↯0_2[]) ¤) :
+ApplyTableToRanges ← ⊏⍏≡⊢. ∧(⊂⊔)⊙(↯0_2[]) ≡(□ApplyTableToRange) ⊙¤
+
+ApplyTablesToRanges ← ∧(ApplyTableToRanges : ⊔)
+
+PartTwo ← ⊡ 0_0 ApplyTablesToRanges : ↯¯1_2 Parse
+PartOne ← ⊡ 0_0 ApplyTablesToRanges : ≡(⊂:1) Parse
+
+$ seeds: 79 14 55 13
+$
+$ seed-to-soil map:
+$ 52 50 48
+$ 50 98 2
+$
+$ soil-to-fertilizer map:
+$ 0 15 37
+$ 37 52 2
+$ 39 0 15
+$
+$ fertilizer-to-water map:
+$ 49 53 8
+$ 0 11 42
+$ 42 0 7
+$ 57 7 4
+$
+$ water-to-light map:
+$ 88 18 7
+$ 18 25 70
+$
+$ light-to-temperature map:
+$ 45 77 23
+$ 81 45 19
+$ 68 64 13
+$
+$ temperature-to-humidity map:
+$ 0 69 1
+$ 1 0 69
+$
+$ humidity-to-location map:
+$ 60 56 37
+$ 56 93 4
+
+⍤⊃⋅∘≍ 35 PartOne .
+⍤⊃⋅∘≍ 46 PartTwo
+```
+
+J'en ai profité pour exprimer `PartOne` en fonction du code écrit pour la deuxième partie, puisque ce n'est qu'un cas particulier.
