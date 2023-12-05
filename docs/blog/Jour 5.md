@@ -2,7 +2,7 @@
 
 Ça n'a pas trop mal marché de rédiger en même temps que je réfléchissais au problème. Quand les jours avancent et que les problèmes se complexifient, il devient de toute façon indispensable de se poser un peu avant de se lancer dans l'implémentation.
 
-Ça ne m'a quand même pas mis à l'abri d'une erreur hier, qui était de construire une structure trop compliquée : j'ai représenté chque carte par un vecteur de `1` consécutifs alors que j'aurais pu me contenter de stocker la longueur du vecteur, ce qui aurait été plus simple à parcourir dans la suite de l'algorithme. Je crois que j'ai vraiment intérêt à favoriser les structures les plus simples qui soient avec ce langage.
+Ça ne m'a quand même pas mis à l'abri d'une erreur hier, qui était de construire une structure trop compliquée : j'ai représenté chaque carte par un vecteur de `1` consécutifs alors que j'aurais pu me contenter de stocker la longueur du vecteur, ce qui aurait été plus simple à parcourir dans la suite de l'algorithme. Je crois que j'ai vraiment intérêt à favoriser les structures les plus simples qui soient avec ce langage.
 
 ## Partie 1
 
