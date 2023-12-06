@@ -111,7 +111,7 @@ Pas possible ici de se passer de `rows`, car `CountWays` utilise au moins une op
 
 Alors le loup c'est qu'il ne fallait pas lire plusieurs colonnes de nombres mais une seule en ignorant les espaces, donc ceci :
 
-```
+```no_run
 $ Time:      7  15   30
 $ Distance:  9  40  200
 ```
