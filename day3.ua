@@ -6,12 +6,8 @@ Parse ← ≡⊔Lines
 
 FindSymbols ← ¬∊: "0123456789."
 
-Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
-UnGrow ← ≡(↘2↻¯1)↘2↻¯1
-Grow ← setund(Grow|Grow|UnGrow)
-
 Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
-Neighbors ← /↥≡(⍜(⊙Grow)↻) Directions ¤
+Neighbors ← /↥≡(⬚0↻) Directions ¤
 
 KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
 
@@ -81,22 +77,6 @@ Aeq ⊙FindSymbols
  0_0_0_0]
 
 Aeq ⊙Neighbors
-
-[1_0_0_0
- 0_0_0_0
- 0_0_0_0
- 0_0_0_0]
-
-[0_0_0_0_0_0
- 0_1_0_0_0_0
- 0_0_0_0_0_0
- 0_0_0_0_0_0
- 0_0_0_0_0_0
- 0_0_0_0_0_0]
-
-Aeq ⊙Grow ,,
-
-Aeq ⊙UnGrow :
 
 [1_0_0_0
  0_0_0_0
