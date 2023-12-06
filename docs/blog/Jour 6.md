@@ -71,3 +71,48 @@ $ Distance:  9  40  200
 ⍤⊃⋅∘≍ 288 PartOne
 ```
 
+# Partie 2
+
+Alors le loup c'est qu'il ne fallait pas lire plusieurs colonnes de nombres mais une seule en ignorant les espaces, donc ceci :
+
+```
+$ Time:      7  15   30
+$ Distance:  9  40  200
+```
+
+Décrit une seule course de 71530 millisecondes avec une distance record de 940200 millimètres.
+
+Il faut donc refaire le parsing. Je m'en sors en remplaçant `partition``parse` par `parse``keep` :
+
+```
+ParseTwo ← ⍉⊜(parse ▽ ∊:"0123456789".)≠@\n.
+$ Time:      7  15   30
+$ Distance:  9  40  200
+ParseTwo
+```
+
+Évidemment, je peux essayer d'appliquer la même logique que pour la première partie, et ça va marcher sur l'exemple :
+
+```
+ParseTwo ← ⍉⊜(parse ▽ ∊:"0123456789".)≠@\n.
+CountWays ← (
+  ⍘⊟
+  .
+  ⊙(
+    ⊓(+1⇡-1|+1¤)
+    ≡TimeFor
+  )
+  /+≤
+)
+
+PartTwo ← CountWays ParseTwo
+$ Time:      7  15   30
+$ Distance:  9  40  200
+ParseTwo
+```
+
+Mais bien sûr, le nombre de possibilités à tester dans l'entrée complète (de `1` à `46828478` millisecondes) va être trop grand pour… ah non, c'est déjà fini, en 21 secondes et c'est la bonne réponse 😮.
+
+
+
+
