@@ -11,12 +11,16 @@ TimeFor ← (
 
 CountWays ← (
   ⍘⊟
-  .
-  ⊙(
-    ⊓(+1⇡-1|+1¤)
-    ≡TimeFor
+  ⊃(
+    ∘ # on garde le temps total
+  | ⊓(
+      +1⇡ # intervalle de 1 jusqu'au temps total
+    | ¤+1 # distance supérieure au record, fixée pour l'itération qui suit
+    )
+    TimeFor # on calcule le temps de parcours pour chaque temps de charge possible
   )
-  /+≤
+  ≤  # on compare chaque temps de parcours au temps disponible
+  /+ # on compte combien sont possibles
 )
 
 PartOne ← (
