@@ -29,7 +29,8 @@ On me demande combien de façons (temps d'accélération) il y a de gagner chaqu
 Ça ne devrait pas être trop compliqué. Noter l'utilisation de `transpose` à la fin.
 
 ```
-Parse ← ⍉⊜(⊜parse ∊:"0123456789".)≠@\n.
+IsDigit ← ∊:"0123456789"
+Parse ← ⍉⊜(⊜parse IsDigit.)≠@\n.
 
 $ Time:      7  15   30
 $ Distance:  9  40  200
@@ -39,7 +40,8 @@ Parse
 Si on veut s'amuser, il était aussi possible de l'écrire comme ceci :
 
 ```
-Parse ← ⍉ ↯2_¯1 ⊜parse ∊:"0123456789".
+IsDigit ← ∊:"0123456789"
+Parse ← ⍉ ↯2_¯1 ⊜parse IsDigit.
 
 $ Time:      7  15   30
 $ Distance:  9  40  200
@@ -71,12 +73,12 @@ Ensuite j'énumère les temps de charge possible, de `1` au temps disponible, po
 TimeFor ← +⊃∘(⌈÷)
 
 CountWays ← (
-  ⍘⊟
+  ⍘⊟ # on déballe le temps et la distance sur la pile
   ⊃(
     ∘ # on garde le temps total
   | ⊓(
       +1⇡ # intervalle de 1 jusqu'au temps total
-    | ¤+1 # distance supérieure au record, fixée pour l'itération qui suit
+    | +1  # distance supérieure au record
     )
     TimeFor # on calcule le temps de parcours pour chaque temps de charge possible
   )
@@ -92,7 +94,8 @@ Détail amusant, j'avais initialement écrit `rows``TimeFor` pour appliquer `Tim
 Plus qu'à faire le produits de ces nombres de possibilités, comme demandé, et ça fait `PartOne` :
 
 ```
-Parse ← ⍉⊜(⊜parse ∊:"0123456789".)≠@\n.
+IsDigit ← ∊:"0123456789"
+Parse ← ⍉⊜(⊜parse IsDigit.)≠@\n.
 TimeFor ← +⊃∘(⌈÷)
 CountWays ← /+ ≤ ⊃(∘|TimeFor ⊓(+1⇡|¤+1)) ⍘⊟
 PartOne ← /× ≡CountWays Parse
@@ -118,7 +121,8 @@ Décrit une seule course de 71530 millisecondes avec une distance record de 9402
 Il faut donc refaire le _parsing_. Je m'en sors en remplaçant `partition``parse` par `parse``keep` :
 
 ```
-ParseTwo ← ⊜(parse ▽ ∊:"0123456789".)≠@\n.
+IsDigit ← ∊:"0123456789"
+ParseTwo ← ⊜(parse ▽ IsDigit.)≠@\n.
 $ Time:      7  15   30
 $ Distance:  9  40  200
 ParseTwo
@@ -127,7 +131,8 @@ ParseTwo
 Évidemment, je peux essayer d'appliquer la même logique que pour la première partie, et ça va marcher sur l'exemple :
 
 ```
-ParseTwo ← ⊜(parse ▽ ∊:"0123456789".)≠@\n.
+IsDigit ← ∊:"0123456789"
+ParseTwo ← ⊜(parse ▽ IsDigit.)≠@\n.
 TimeFor ← +⊃∘(⌈÷)
 CountWays ← /+ ≤ ⊃(∘|TimeFor ⊓(+1⇡|¤+1)) ⍘⊟
 PartTwo ← CountWays ParseTwo
@@ -138,3 +143,78 @@ $ Distance:  9  40  200
 ```
 
 Mais bien sûr, le nombre de possibilités à tester dans l'entrée complète (de `1` à `46828478` millisecondes) va être trop grand pour… ah non, c'est déjà fini, en 21 secondes et c'est la bonne réponse.
+
+Bon, du coup j'ai le temps d'optimiser un peu.
+
+Déjà, une simplification : dans la précipitation, j'ai fait inutilement compliqué en calculant le temps nécessaire pour parcourir la distance requise pour ensuite comparer ce temps au temps disponible. J'aurais pu plus simplement calculer la distance parcourue en chargeant `n` millisecondes étant donné le temps disponible.
+
+```
+DistanceFor ← (
+  ⊃∘- # on garde le temps de charge, et on le soustrait du temps total
+  ×   # le produit des deux donne la distance parcourue
+)
+DistanceFor 3 7
+```
+
+Ce qui simplifie d'autant `CountWays` :
+
+```
+DistanceFor ← ⊃∘- ×
+CountWays ← (
+  ⍘⊟ # on déballe le temps et la distance sur la pile
+  ⇡. # intervalle de 0 jusqu'au temps total
+  DistanceFor
+  <  # on regarde dans quels cas on a dépassé le record
+  /+ # on les compte
+)
+CountWays 7_9
+```
+
+Donc au final ça donne :
+
+```
+IsDigit ← ∊:"0123456789"
+ParseOne ← ⍉⊜(⊜parse IsDigit.)≠@\n.
+ParseTwo ← ⊜(parse ▽ IsDigit.)≠@\n.
+DistanceFor ← ×⊃∘-
+CountWays ← /+ < DistanceFor ⇡. ⍘⊟
+
+PartOne ← /× ≡CountWays ParseOne
+PartTwo ← CountWays ParseTwo
+
+$ Time:      7  15   30
+$ Distance:  9  40  200
+⍤⊃⋅∘≍ 288 PartOne .
+⍤⊃⋅∘≍ 71503 PartTwo
+```
+
+En bonus, l'énumération de la partie 2 ne prend plus qu'une seconde au lieu d'une vingtaine.
+
+Pour finir, je m'amuse avec une petite visualisation :
+
+```
+DistanceFor ← ×⊃∘-
+
+46828479 347152214061471 # temps, distance
+
+Width ← 200
+X ← ÷ ⊃∘⇡ Width
+⊓(
+  ×X.         # x = `Width` étapes entre 0 et le temps total
+  DistanceFor # calcul de f(x)
+| ×2          # maximum pour y = double de la distance cible
+)
+÷: # ramener les f(x) entre 0 et 1 en divisant par le y maximum
+Red ← 1_0.5_0.5
+Green ← 0.5_1_0.5
+⇌X # y croissant de bas en haut
+⊠(
+  ×⊃(
+    (Red|Green)>0.5; # couleur en fonction de f(x)
+  | >                # point allumé si y < f(x)
+  )
+)
+&ims
+```
+
+On voit bien que la distance atteinte est une simple parabole. La réponse au problème doit donc être donnée par une résolution d'équation du second degré, mais je laisserai cet exercice à la lectrice ou au lecteur.
