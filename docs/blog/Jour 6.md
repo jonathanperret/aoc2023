@@ -30,7 +30,7 @@ On me demande combien de façons (temps d'accélération) il y a de gagner chaqu
 
 ```
 IsDigit ← ∊:"0123456789"
-Parse ← ⍉⊜(⊜parse IsDigit.)≠@\n.
+Parse ← ⍉⊜(⊜⋕ IsDigit.)≠@\n.
 
 $ Time:      7  15   30
 $ Distance:  9  40  200
@@ -41,7 +41,7 @@ Si on veut s'amuser, il était aussi possible de l'écrire comme ceci :
 
 ```
 IsDigit ← ∊:"0123456789"
-Parse ← ⍉ ↯2_¯1 ⊜parse IsDigit.
+Parse ← ⍉ ↯2_¯1 ⊜⋕ IsDigit.
 
 $ Time:      7  15   30
 $ Distance:  9  40  200
@@ -95,7 +95,7 @@ Plus qu'à faire le produits de ces nombres de possibilités, comme demandé, et
 
 ```
 IsDigit ← ∊:"0123456789"
-Parse ← ⍉⊜(⊜parse IsDigit.)≠@\n.
+Parse ← ⍉⊜(⊜⋕ IsDigit.)≠@\n.
 TimeFor ← +⊃∘(⌈÷)
 CountWays ← /+ ≤ ⊃(∘|TimeFor ⊓(+1⇡|¤+1)) ⍘⊟
 PartOne ← /× ≡CountWays Parse
@@ -122,7 +122,7 @@ Il faut donc refaire le _parsing_. Je m'en sors en remplaçant `partition``parse
 
 ```
 IsDigit ← ∊:"0123456789"
-ParseTwo ← ⊜(parse ▽ IsDigit.)≠@\n.
+ParseTwo ← ⊜(⋕ ▽ IsDigit.)≠@\n.
 $ Time:      7  15   30
 $ Distance:  9  40  200
 ParseTwo
@@ -132,7 +132,7 @@ ParseTwo
 
 ```
 IsDigit ← ∊:"0123456789"
-ParseTwo ← ⊜(parse ▽ IsDigit.)≠@\n.
+ParseTwo ← ⊜(⋕ ▽ IsDigit.)≠@\n.
 TimeFor ← +⊃∘(⌈÷)
 CountWays ← /+ ≤ ⊃(∘|TimeFor ⊓(+1⇡|¤+1)) ⍘⊟
 PartTwo ← CountWays ParseTwo
@@ -174,8 +174,8 @@ Donc au final ça donne :
 
 ```
 IsDigit ← ∊:"0123456789"
-ParseOne ← ⍉⊜(⊜parse IsDigit.)≠@\n.
-ParseTwo ← ⊜(parse ▽ IsDigit.)≠@\n.
+ParseOne ← ⍉⊜(⊜⋕ IsDigit.)≠@\n.
+ParseTwo ← ⊜(⋕ ▽ IsDigit.)≠@\n.
 DistanceFor ← ×⊃∘-
 CountWays ← /+ < DistanceFor ⇡. ⍘⊟
 

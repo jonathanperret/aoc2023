@@ -25,7 +25,7 @@ $ .664.598..
 
 Et il faut identifier tous les chiffres qui sont adjacents (même en diagonale) à un symbole autre que "." (ou un autre chiffre).
 
-Au moins, aujourd'hui pas d'excuse de difficulté de _parsing_ ! Après le découpage en lignes il me suffit d'enlever les boîtes superflues (comme toutes les lignes ont la même longueur) avec `unbox` :
+Au moins, aujourd'hui pas d'excuse de difficulté de _parsing_ ! Après le découpage en lignes il me suffit d'enlever les boîtes superflues (comme toutes les lignes ont la même longueur) avec `un``box` :
 
 ```
 $ 467..114..
@@ -40,7 +40,7 @@ $ ...$.*....
 $ .664.598..
 
 Lines ← ⊕□⍜▽¯:\+.=, @\n
-Parse ← ≡⊔Lines
+Parse ← ≡°□Lines
 Parse
 ```
 
@@ -54,7 +54,7 @@ Je pourrais aussi faire l'inverse : pour chaque symbole trouvé dans la matrice
 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
-Parse ← ≡⊔Lines
+Parse ← ≡°□Lines
 
 $ ....
 $ ....
@@ -250,7 +250,7 @@ Puis utiliser `partition`, on a l'habitude maintenant :
 ```
 ".12.34.56."
 
-⊜parse ∊:"0123456789".
+⊜⋕ ∊:"0123456789".
 ```
 
 C'est sympa mais il faut que je sache lesquels de ces nombres recouvrent mon masque de voisinage.
@@ -278,7 +278,7 @@ J'obtiens bien une liste de `1` et de `0` de la même longueur que la liste de n
 Je combine les deux opérations avec `fork`, je saupoudre d'opérateurs de pile comme `over`, `pop` et `flip` pour amener les arguments là où il faut, j'enchaîne avec le `keep` et ça me donne `KeepNumbers` :
 
 ```
-KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
+KeepNumbers ← ▽⊃(⊜/↥|⊜⋕;:)∊:"0123456789",
 
 KeepNumbers 1_1_1_0_0_1_0_0_0_0 ".12.34.56."
 ```
@@ -293,7 +293,7 @@ Au lieu de `box` j'utilise donc à nouveau `fill`, qui résoud le problème en c
 # Experimental!
 
 Lines ← ⊕□⍜▽¯:\+.=, @\n
-Parse ← ≡⊔Lines
+Parse ← ≡°□Lines
 FindSymbols ← ¬∊: "0123456789."
 
 Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
@@ -303,7 +303,7 @@ Grow ← setund(Grow|Grow|UnGrow)
 Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
 Neighbors ← /↥≡ (⍜(⊙Grow)↻) Directions ¤
 
-KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
+KeepNumbers ← ▽⊃(⊜/↥|⊜⋕;:)∊:"0123456789",
 
 $ 467..114..
 $ ...*......
@@ -343,7 +343,7 @@ On enchaîne tout ça et ça donne enfin `PartOne` :
 # Experimental!
 
 Lines ← ⊕□⍜▽¯:\+.=, @\n
-Parse ← ≡⊔Lines
+Parse ← ≡°□Lines
 FindSymbols ← ¬∊: "0123456789."
 
 Grow ← ≡(⊂0⊂:0)⬚0⊂:0⬚0⊂0
@@ -353,7 +353,7 @@ Grow ← setund(Grow|Grow|UnGrow)
 Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
 Neighbors ← /↥ ≡(⍜(⊙Grow)↻) Directions ¤
 
-KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
+KeepNumbers ← ▽⊃(⊜/↥|⊜⋕;:)∊:"0123456789",
 
 PartOne ← (
   Parse
@@ -405,7 +405,7 @@ Je commence donc par trouver les `*` dans la matrice, facile. J'appelle ça `Fin
 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
-Parse ← ≡⊔Lines
+Parse ← ≡°□Lines
 FindGears ← =@*
 
 $ 467..114..
@@ -536,7 +536,7 @@ Avec ce masque de voisins et la matrice d'origine, je peux utiliser `KeepNumbers
 Sauf que cette fois, je ne veux pas utiliser `fill` pour régler le problème du nombre variable de nombres sur différentes lignes. Je vais plutôt mettre chaque liste en boîte :
 
 ```
-KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
+KeepNumbers ← ▽⊃(⊜/↥|⊜⋕;:)∊:"0123456789",
 
 ["1.."
  "2.3"
@@ -559,7 +559,7 @@ Et ensuite je rassemble tous ces tableaux contenus dans des boîtes en un seul a
 J'appelle cette combinaison `KeepAllNumbers`, parce que je manque d'imagination.
 
 ```
-KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
+KeepNumbers ← ▽⊃(⊜/↥|⊜⋕;:)∊:"0123456789",
 KeepAllNumbers ← /⊐⊂ ≡(□KeepNumbers)
 
 ["1.."
@@ -592,7 +592,7 @@ Plus qu'à enchaîner tout ça pour obtenir `PartTwo` :
 # Experimental!
 
 Lines ← ⊕□⍜▽¯:\+.=, @\n
-Parse ← ≡⊔Lines
+Parse ← ≡°□Lines
 FindGears ← =@*
 SplitMask = ≡(⍜⊡⋅1)⊃(⊚|∵⋅0¤)
 
@@ -603,7 +603,7 @@ Grow ← setund(Grow|Grow|UnGrow)
 Directions ← [1_¯1 0_1 1_1 0_¯1 1_0¯1_¯1 ¯1_0 ¯1_1]
 Neighbors ← /↥ ≡(⍜(⊙Grow)↻) Directions ¤
 
-KeepNumbers ← ▽⊃(⊜/↥|⊜parse;:)∊:"0123456789",
+KeepNumbers ← ▽⊃(⊜/↥|⊜⋕;:)∊:"0123456789",
 KeepAllNumbers ← /⊐⊂ ≡(□KeepNumbers)
 
 GearRatio ← (⋅0|/×) =2 ⧻.

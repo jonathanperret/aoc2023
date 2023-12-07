@@ -155,7 +155,7 @@ Enfin c'est un découpage classique par ligne et colonne. Noter que si la foncti
 
 ```
 ParseHand ← ⊗:"0123456789TJQKA"
-Parse ← ⊜(⊓ParseHand parse ⊃(↙5|↘6)) ≠@\n.
+Parse ← ⊜(⊓ParseHand ⋕ ⊃(↙5|↘6)) ≠@\n.
 
 $ 32T3K 765
 $ T55J5 684
@@ -176,7 +176,7 @@ AddGroups ← ⊂ Groups .
 SortByHands ← ⊏ ⍏ ≡AddGroups
 ScoreGame ← /+ × +1⇡⧻.
 ParseHand ← ⊗:"0123456789TJQKA"
-Parse ← ⊜(⊓ParseHand parse ⊃(↙5|↘6)) ≠@\n.
+Parse ← ⊜(⊓ParseHand ⋕ ⊃(↙5|↘6)) ≠@\n.
 PartOne ← (
   Parse
   SortByHands
@@ -303,7 +303,7 @@ Voici enfin `PartTwo`.
 
 ```
 ParseHandTwo ← ⊗:"0J23456789TQKA"
-ParseTwo ← ⊜(⊓ParseHandTwo parse ⊃(↙5|↘6)) ≠@\n.
+ParseTwo ← ⊜(⊓ParseHandTwo ⋕ ⊃(↙5|↘6)) ≠@\n.
 Sort ← ⊏⍏.
 Groups ← ⬚0↯ [5]  ⇌Sort  ⊕⧻  ⊛  .
 SubAllJokers ← ≡(⍜(⊙▽∘)≡(⊓∘;)) +2⇡12 ∩¤ =1.

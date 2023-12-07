@@ -63,14 +63,14 @@ J'arrive assez vite à ceci :
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
 ParseSeeds ← (
-  ⊔
+  °□
   ↘+2⊗@:.
-  ⊜parse≠@\s.
+  ⊜⋕≠@\s.
 )
 ParseMap ← (
-  ⊔
+  °□
   ↘1
-  ≡(⊜parse ≠@\s. ⊔)
+  ≡(⊜⋕ ≠@\s. °□)
   □
 )
 ParseMaps ← (
@@ -180,7 +180,7 @@ ApplyTables ← (
   # {[52_50_48 50_98_2] [0_10_200]} 99
   ∧(
     # □[52_50_48 50_98_2] 99
-    ⊔ # [52_50_48 50_98_2] 99
+    °□ # [52_50_48 50_98_2] 99
     : # 99 [52_50_48 50_98_2]
     ApplyTable
   )
@@ -216,7 +216,7 @@ Et quand j'applique ça sur l'exemple, je tombe sur des erreurs d'intervalles no
 
 ```
 FixTables ← ≡(
-  ⊔
+  °□
   0_0_∞
   ⊂:
   □
@@ -230,14 +230,14 @@ L'enchaînement de tout ça donne `PartOne`:
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
 ParseSeeds ← (
-  ⊔
+  °□
   ↘+2⊗@:.
-  ⊜parse≠@\s.
+  ⊜⋕≠@\s.
 )
 ParseMap ← (
-  ⊔
+  °□
   ↘1
-  ≡(⊜parse ≠@\s. ⊔)
+  ≡(⊜⋕ ≠@\s. °□)
   □
 )
 ParseMaps ← (
@@ -255,7 +255,7 @@ Parse ← (
   )
 )
 FixTables ← ≡(
-  ⊔
+  °□
   0_0_∞
   ⊂:
   □
@@ -294,7 +294,7 @@ ApplyTables ← (
   # {[52_50_48 50_98_2] [0_10_200]} 99
   ∧(
     # □[52_50_48 50_98_2] 99
-    ⊔ # [52_50_48 50_98_2] 99
+    °□ # [52_50_48 50_98_2] 99
     : # 99 [52_50_48 50_98_2]
     ApplyTable
   )
@@ -466,14 +466,14 @@ Maintenant que je suis confiant sur le fait que j'ai la bonne piste, il ne reste
 Lines ← ⊕□⍜▽¯:\+.=, @\n
 
 ParseSeeds ← (
-  ⊔
+  °□
   ↘+2⊗@:.
-  ⊜parse≠@\s.
+  ⊜⋕≠@\s.
 )
 ParseMap ← (
-  ⊔
+  °□
   ↘1
-  ≡(⊜parse ≠@\s. ⊔)
+  ≡(⊜⋕ ≠@\s. °□)
   □
 )
 ParseMaps ← (
@@ -564,13 +564,13 @@ ApplyTableToRangeStep ← (|3.2
     ApplyRangeToRange
     ∩□
   )
-  ∩(∧(⊂⊔)⊙(↯0_2[]))
+  ∩(∧(⊂°□)⊙(↯0_2[]))
   ⊙⊂
 )
 
 ConvertSeeds ← ↯¯1_2
 SortRanges ← ⊏⍏≡⊢.
-JoinBoxed ← ∧(⊂⊔)⊙(↯0_2[])
+JoinBoxed ← ∧(⊂°□)⊙(↯0_2[])
 
 ApplyTableToRange ← (
   :
@@ -592,7 +592,7 @@ ApplyTableToRanges ← (
 
 ApplyTablesToRanges ← (
   ∧(|2
-    ⊔
+    °□
     :
     ApplyTableToRanges
   )
@@ -650,8 +650,8 @@ Par curiosité (et pour pouvoir plus facilement partager ma solution) j'ai voulu
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
 
-ParseSeeds ← ⊜parse≠@\s. ↘+2⊗@:. ⊔
-ParseMap ← □ ≡(⊜parse ≠@\s. ⊔) ↘1
+ParseSeeds ← ⊜⋕≠@\s. ↘+2⊗@:. °□
+ParseMap ← □ ≡(⊜⋕ ≠@\s. °□) ↘1
 ParseMaps ← ⊜ParseMap ≠0≡⧻.
 Parse ← ⊃(ParseSeeds ⊢|ParseMaps ↘2) Lines
 
@@ -660,12 +660,12 @@ MiddleSegment ← ⍜⊢+ ⊟:-,: ⊃(↥ ⊓(⊢|⊡1)|↧ ∩/+⊙(↘1)|- ⊃
 RightSegment ← ⊟: -, ⊃(/+|↥ ⊓(⊢|/+↘1))
 
 ApplyRangeToRange ← ∩(▽ >0 ⊃(≡⊡1)∘) ⊃(⊟⊃(LeftSegment|RightSegment)|¤ MiddleSegment)
-ApplyTableToRangeStep ← |3.2 ⊙⊂ ∩(∧(⊂⊔)⊙(↯0_2[])) ≡(∩□ ApplyRangeToRange :) ¤
+ApplyTableToRangeStep ← |3.2 ⊙⊂ ∩(∧(⊂°□)⊙(↯0_2[])) ≡(∩□ ApplyRangeToRange :) ¤
 
 ApplyTableToRange ← ⊂ ∧ApplyTableToRangeStep ⊙(⊙(↯0_2[]) ¤) :
-ApplyTableToRanges ← ⊏⍏≡⊢. ∧(⊂⊔)⊙(↯0_2[]) ≡(□ApplyTableToRange) ⊙¤
+ApplyTableToRanges ← ⊏⍏≡⊢. ∧(⊂°□)⊙(↯0_2[]) ≡(□ApplyTableToRange) ⊙¤
 
-ApplyTablesToRanges ← ∧(ApplyTableToRanges : ⊔)
+ApplyTablesToRanges ← ∧(ApplyTableToRanges : °□)
 
 PartTwo ← ⊡ 0_0 ApplyTablesToRanges : ↯¯1_2 Parse
 PartOne ← ⊡ 0_0 ApplyTablesToRanges : ≡(⊂:1) Parse

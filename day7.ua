@@ -24,14 +24,14 @@ ScoreGame ← (
   /+
 )
 ParseHand ← ⊗:"0123456789TJQKA"
-Parse ← ⊜(⊓ParseHand parse ⊃(↙5|↘6)) ≠@\n.
+Parse ← ⊜(⊓ParseHand ⋕ ⊃(↙5|↘6)) ≠@\n.
 PartOne ← (
   Parse
   SortByHands
   ScoreGame
 )
 ParseHandTwo ← ⊗:"0J23456789TQKA"
-ParseTwo ← ⊜(⊓ParseHandTwo parse ⊃(↙5|↘6)) ≠@\n.
+ParseTwo ← ⊜(⊓ParseHandTwo ⋕ ⊃(↙5|↘6)) ≠@\n.
 
 SubAllJokers ← (
   =1.

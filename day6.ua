@@ -2,7 +2,7 @@
 Aeq ← ⍤⊃($"\nexpected\n_\ngot\n_")≍
 
 IsDigit ← ∊:"0123456789"
-ParseOne ← ⍉⊜(⊜parse IsDigit.)≠@\n.
+ParseOne ← ⍉⊜(⊜⋕ IsDigit.)≠@\n.
 
 DistanceFor ← (
   # chargeTime totalTime
@@ -12,7 +12,7 @@ DistanceFor ← (
 )
 
 CountWays ← (
-  ⍘⊟
+  °⊟
   ⇡.
   DistanceFor
   <
@@ -25,7 +25,7 @@ PartOne ← (
   /×
 )
 
-ParseTwo ← ⍉⊜(parse ▽ IsDigit.)≠@\n.
+ParseTwo ← ⍉⊜(⋕ ▽ IsDigit.)≠@\n.
 
 PartTwo ← CountWays ParseTwo
 

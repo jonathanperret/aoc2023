@@ -3,31 +3,31 @@ Aeq ← ⍤⊃($"expected _ got _")≍
 
 ExtractRGB ← (
   ≡(
-    ×⊃(⊔="rgb"⊔⊢|⊔⊡1)
+    ×⊃(°□="rgb"°□⊢|°□⊡1)
   )
   /↥
 )
 ParseRound ← (
   ♭ regex "\\d+ [rgb]"
-  ≡({⊃(⊢⇌|parse⇌↘2⇌⊔)})
+  ≡({⊃(⊢⇌|⋕⇌↘2⇌°□)})
   ExtractRGB
 )
 ParseGame ← (
   ♭ regex "[^;]+" ↘8
   ≡ParseRound
 )
-Parse ← ≡(□ ParseGame ⊔) Lines
+Parse ← ≡(□ ParseGame °□) Lines
 
 IsPossible ← /↧♭≡(≤12_13_14)
 PartOne ← (
   Parse
-  ≡(IsPossible ⊔)
+  ≡(IsPossible °□)
   ▽:+1⇡⧻.
   /+
 )
 
 GamePower ← /×/↥
-PartTwo ← /+≡(GamePower ⊔) Parse
+PartTwo ← /+≡(GamePower °□) Parse
 
 ---
 Aeq 5_3_30 ExtractRGB [{@b 30} {@g 3} {@r 5}]

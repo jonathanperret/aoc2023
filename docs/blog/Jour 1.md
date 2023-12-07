@@ -80,23 +80,23 @@ Les deux caractères ainsi obtenus sont rassemblés en une liste — donc une ch
 $ 1abc2def3
 ▽↧⊃(≥@0|≤@9) . # on ne garde que les chiffres
 ⊟⊃(⊢|⊢⇌)       # on retient le premier et le dernier dans une chaîne
-parse          # on convertit la chaîne en entier
+⋕          # on convertit la chaîne en entier
 ```
 
 Je peux donner un nom à cette séquence d'opérations :
 
 ```
-PartOneLine ← parse ⊟⊃(⊢|⊢⇌)▽↧⊃(≥@0|≤@9).
+PartOneLine ← ⋕ ⊟⊃(⊢|⊢⇌)▽↧⊃(≥@0|≤@9).
 
 $ 1abc2def3
 PartOneLine
 ```
 
-Je peux ensuite appliquer cette fonction à toutes les lignes de l'entrée avec `rows` (il faut appliquer un petit `unbox` avant de traiter chaque ligne pour défaire le `box` appliqué par `Lines` pour permettre de faire cohabiter des chaînes de longueurs différentes dans un tableau).
+Je peux ensuite appliquer cette fonction à toutes les lignes de l'entrée avec `rows` (il faut appliquer un petit `un``box` avant de traiter chaque ligne pour défaire le `box` appliqué par `Lines` pour permettre de faire cohabiter des chaînes de longueurs différentes dans un tableau).
 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
-PartOneLine ← parse ⊟⊃(⊢|⊢⇌)▽↧⊃(≥@0|≤@9).
+PartOneLine ← ⋕ ⊟⊃(⊢|⊢⇌)▽↧⊃(≥@0|≤@9).
 
 $ 1abc2
 $ pqr3stu8vwx
@@ -104,15 +104,15 @@ $ a1b2c3d4e5f
 $ treb7uchet
 
 Lines
-≡(PartOneLine ⊔)
+≡(PartOneLine °□)
 ```
 
 Enfin, j'applique un `reduce` avec `add` pour obtenir la somme des nombres et ça me donne ma fonction `PartOne` qui donne la réponse à la partie 1.
 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
-PartOneLine ← parse ⊟⊃(⊢|⊢⇌)▽↧⊃(≥@0|≤@9).
-PartOne ← /+ ≡(PartOneLine ⊔) Lines
+PartOneLine ← ⋕ ⊟⊃(⊢|⊢⇌)▽↧⊃(≥@0|≤@9).
+PartOne ← /+ ≡(PartOneLine °□) Lines
 
 $ 1abc2
 $ pqr3stu8vwx
@@ -172,7 +172,7 @@ Enfin, je convertis ces deux indices en caractères (en ajoutant le caractère `
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
           "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
 
-parse +@0 ≡((∘|-9)>9. ⊗ : Digits) { "1" "three" }
+⋕ +@0 ≡((∘|-9)>9. ⊗ : Digits) { "1" "three" }
 ```
 
 Au passage, comme j'ai maintenant dans `Digit` une liste des chaînes à chercher, je peux m'en servir pour construire l'expression régulière de recherche, plutôt que de répéter la liste dans le code. Là encore je pique deux fonctions dans les [Uiuisms](https://www.uiua.org/docs/isms) : une pour insérer un caractère `|` entre les chaînes, une autre pour concaténer toutes les chaînes.
@@ -185,7 +185,7 @@ DigitRE ← ⊐/⊂↘1♭≡⊂ "|" Digits
 DigitRE
 ```
 
-En fait il y avait plus simple en utilisant les "chaînes à trous" de Uiua, c'est-à-dire que `$"hello, _"` crée une fonction qui si on lui passe `"world"` renvoie `hello, world`. La fonction `$"_|_"` appliquée à deux chaînes les concatène donc en les séparant par un caractère `|`. Il n'y a plus qu'à appliquer cette fonction de façon répétée avec `reduce`. Il reste une petite subtilité parce que `Digits` reste une liste de boîtes, pas de chaînes, et on veut passer des chaînes à `$"_|_"`. On peut s'en sortir en écrivant `$"_|_"∩⊔`, qui utilise `both` et `unbox` pour "déballer" les deux arguments, ou bien on peut utiliser `pack` qui est un modificateur un peu magique censé automatiquement emballer/déballer les valeurs quand il le faut. En tout cas, ici ça marche 🤷.
+En fait il y avait plus simple en utilisant les "chaînes à trous" de Uiua, c'est-à-dire que `$"hello, _"` crée une fonction qui si on lui passe `"world"` renvoie `hello, world`. La fonction `$"_|_"` appliquée à deux chaînes les concatène donc en les séparant par un caractère `|`. Il n'y a plus qu'à appliquer cette fonction de façon répétée avec `reduce`. Il reste une petite subtilité parce que `Digits` reste une liste de boîtes, pas de chaînes, et on veut passer des chaînes à `$"_|_"`. On peut s'en sortir en écrivant `$"_|_"∩°□`, qui utilise `both` et `un``box` pour "déballer" les deux arguments, ou bien on peut utiliser `pack` qui est un modificateur un peu magique censé automatiquement emballer/déballer les valeurs quand il le faut. En tout cas, ici ça marche 🤷.
 
 ```
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
@@ -204,7 +204,7 @@ Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
           "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
 DigitRE ← /⊐$"_|_" Digits
 
-PartTwoLine ← parse +@0≡((∘|-9)>9. indexof : Digits)⊟⊃(⊢|⊢⇌)♭regex DigitRE ⊔
+PartTwoLine ← ⋕ +@0≡((∘|-9)>9. indexof : Digits)⊟⊃(⊢|⊢⇌)♭regex DigitRE °□
 PartTwo ← /+≡PartTwoLine Lines
 
 $ two1nine
@@ -257,7 +257,7 @@ Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
 DigitRE ← /⊐$"_|_" Digits
 Xeger ← ≡⇌ ♭regex ∩⇌
 
-PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢♭regex DigitRE|⊢Xeger DigitRE)⊔
+PartTwoLine ← ⋕ +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢♭regex DigitRE|⊢Xeger DigitRE)°□
 
 PartTwoLine "2fourseven1oneights"
 ```
@@ -272,8 +272,8 @@ Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
 DigitRE ← /⊐$"_|_" Digits
 Xeger ← ≡⇌ ♭regex ∩⇌
 
-PartTwoLine ← parse +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢♭regex DigitRE|⊢Xeger DigitRE)
-PartTwo ← /+≡(PartTwoLine ⊔) Lines
+PartTwoLine ← ⋕ +@0≡((∘|-9)>9. ⊗ : Digits)⊟⊃(⊢♭regex DigitRE|⊢Xeger DigitRE)
+PartTwo ← /+≡(PartTwoLine °□) Lines
 
 $ two1nine
 $ eightwothree

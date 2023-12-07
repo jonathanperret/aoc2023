@@ -3,14 +3,14 @@ Lines ← &i "tools.ua" "Lines"
 Aeq ← ⍤⊃($"\nexpected\n_\ngot\n_")≍
 
 ParseSeeds ← (
-  ⊔
+  °□
   ↘+2⊗@:.
-  ⊜parse≠@\s.
+  ⊜⋕≠@\s.
 )
 ParseMap ← (
-  ⊔
+  °□
   ↘1
-  ≡(⊜parse ≠@\s. ⊔)
+  ≡(⊜⋕ ≠@\s. °□)
   □
 )
 ParseMaps ← (
@@ -28,7 +28,7 @@ Parse ← (
   )
 )
 FixTables ← ≡(
-  ⊔
+  °□
   0_0_∞
   ⊂:
   □
@@ -67,8 +67,8 @@ ApplyTables ← (
   # {[52_50_48 50_98_2] [0_10_200]} 99
   ∧(
     # □[52_50_48 50_98_2] 99
-    ⊔ # [52_50_48 50_98_2] 99
-    : # 99 [52_50_48 50_98_2]
+    °□ # [52_50_48 50_98_2] 99
+    :  # 99 [52_50_48 50_98_2]
     ApplyTable
   )
 )
@@ -150,7 +150,7 @@ ApplyRangeToRange ← (
   )
 )
 
-JoinBoxed ← ∧(⊂⊔)⊙(↯0_2[])
+JoinBoxed ← ∧(⊂°□)⊙(↯0_2[])
 
 ApplyTableToRangeStep ← (|3.2
   # on the stack: ⇡ to apply, and accumulators: ranges to process, transformed ranges
@@ -160,7 +160,7 @@ ApplyTableToRangeStep ← (|3.2
     ApplyRangeToRange
     ∩□
   )
-  ∩(∧(⊂⊔)⊙(↯0_2[]))
+  ∩(∧(⊂°□)⊙(↯0_2[]))
   ⊙⊂
 )
 
@@ -188,7 +188,7 @@ ApplyTableToRanges ← (
 
 ApplyTablesToRanges ← (
   ∧(|2
-    ⊔
+    °□
     :
     ApplyTableToRanges
   )

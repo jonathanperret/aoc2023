@@ -28,7 +28,7 @@ ParseCard ← (
   ↘+1⊗@:. # on enlève les caractères jusqu'au ":"
   ≠@|.    # on détecte ce qui n'est pas "|"
   ⊜(
-    ⊜parse ≠@\s. # on lit les séquences de chiffres
+    ⊜⋕ ≠@\s. # on lit les séquences de chiffres
     □            # qu'on met en boîte pour cohabiter
   )
 )
@@ -45,7 +45,7 @@ ParseCard ← (
   ↘+1⊗@:.
   ≠@|.
   ⊜(
-    ⊜parse ≠@\s.
+    ⊜⋕ ≠@\s.
     □
   )
 )
@@ -68,7 +68,7 @@ OK, maintenant il faut faire correspondre la droite avec la gauche, j'utilise `m
 
 ```
 ScoreCard ← (
-  ⊃(⊔⊡1|⊔⊢) # on sort les deux tableaux de leurs boîtes
+  ⊃(°□⊡1|°□⊢) # on sort les deux tableaux de leurs boîtes
   ⊙¤        # on "fixe" le tableau de droite pour qu'il soit constant
   ≡∊        # …pendant l'itération sur le tableau de gauche
   /+        # on additionne pour savoir combien sont trouvés
@@ -85,7 +85,7 @@ Ah, quand la liste est vide il faut compter 0 points, pas 2 puissance -1 qui fai
 
 ```
 ScoreCard ← (
-  ⊃(⊔⊡1|⊔⊢)
+  ⊃(°□⊡1|°□⊢)
   ≡∊ ⊙¤
   -1/+
   ⁿ:2
@@ -104,7 +104,7 @@ ParseCard ← (
   ↘+1⊗@:.
   ≠@|.
   ⊜(
-    ⊜parse ≠@\s.
+    ⊜⋕ ≠@\s.
     □
   )
 )
@@ -113,7 +113,7 @@ Parse ← (
   ⊜ParseCard
 )
 ScoreCard ← (
-  ⊃(⊔⊡1|⊔⊢)
+  ⊃(°□⊡1|°□⊢)
   ≡∊ ⊙¤
   -1/+
   ⁿ:2
@@ -218,7 +218,7 @@ ParseCard ← (
   ↘+1⊗@:.
   ≠@|.
   ⊜(
-    ⊜parse ≠@\s.
+    ⊜⋕ ≠@\s.
     □
   )
 )
@@ -227,7 +227,7 @@ $ Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 ParseCard
 
 CardVector ← (
-  ⊃(⊔⊡1|⊔⊢)
+  ⊃(°□⊡1|°□⊢)
   ≡∊ ⊙¤
   ▽=1.
 )
@@ -241,7 +241,7 @@ ParseCard ← (
   ↘+1⊗@:.
   ≠@|.
   ⊜(
-    ⊜parse ≠@\s.
+    ⊜⋕ ≠@\s.
     □
   )
 )
@@ -250,7 +250,7 @@ Parse ← (
   ⊜ParseCard
 )
 CardVector ← (
-  ⊃(⊔⊡1|⊔⊢)
+  ⊃(°□⊡1|°□⊢)
   ≡∊ ⊙¤
   ▽=1.
 )
@@ -271,7 +271,7 @@ ParseCard ← (
   ↘+1⊗@:.
   ≠@|.
   ⊜(
-    ⊜parse ≠@\s.
+    ⊜⋕ ≠@\s.
     □
   )
 )
@@ -280,7 +280,7 @@ Parse ← (
   ⊜ParseCard
 )
 CardVector ← (
-  ⊃(⊔⊡1|⊔⊢)
+  ⊃(°□⊡1|°□⊢)
   ≡∊ ⊙¤
   ▽=1.
 )
@@ -507,7 +507,7 @@ ParseCard ← (
   ↘+1⊗@:.
   ≠@|.
   ⊜(
-    ⊜parse ≠@\s.
+    ⊜⋕ ≠@\s.
     □
   )
 )
@@ -516,7 +516,7 @@ Parse ← (
   ⊜ParseCard
 )
 CardVector ← (
-  ⊃(⊔⊡1|⊔⊢)
+  ⊃(°□⊡1|°□⊢)
   ≡∊ ⊙¤
   ▽=1.
 )

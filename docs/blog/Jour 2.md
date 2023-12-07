@@ -57,10 +57,10 @@ Voici où j'en suis, quand je compose les deux découpages :
 ```
 $ 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 ♭regex "[^;]+"         # on découpe selon les points-virgules
-≡(□♭regex "[^,]+" ⊔)   # on sous-découpe selon les virgules
+≡(□♭regex "[^,]+" °□)   # on sous-découpe selon les virgules
 ```
 
-La composition est polluée par des `unbox` (`regex` met les différentes chaînes trouvées dans des boîtes, toujours pour les faire cohabiter dans un tableau) et les `box`, encore pour constituer un tableau de résultat.
+La composition est polluée par des `un``box` (`regex` met les différentes chaînes trouvées dans des boîtes, toujours pour les faire cohabiter dans un tableau) et les `box`, encore pour constituer un tableau de résultat.
 
 Ça commence à devenir alambiqué, mais en plus je me rends compte que la sortie n'est même pas encore parfaitement utilisable : il y a des espaces qui se glissent un peu partout comme par exemple dans ` 4 red`.
 
@@ -83,14 +83,14 @@ Je transforme déjà la chaîne `"3 b"` en une paire dont le premier élément s
 
 ```
 $ 3 b
-⊃(⊢⇌|parse⇌↘2⇌)
+⊃(⊢⇌|⋕⇌↘2⇌)
 ```
 
 Il faut emballer ces deux valeurs dans un tableau de boîtes, ça peut se faire en mettant toute l'expression entre `{}` :
 
 ```
 $ 3 b
-{ ⊃(⊢⇌|parse⇌↘2⇌) }
+{ ⊃(⊢⇌|⋕⇌↘2⇌) }
 ```
 
 OK, maintenant on sait transformer la chaîne représentant un tour du jeu (`3 blue, 4 red`) en une liste de paires :
@@ -99,10 +99,10 @@ OK, maintenant on sait transformer la chaîne représentant un tour du jeu (`3 b
 $ 3 blue, 4 red
 ♭regex "[^,]+"         # on découpe selon les virgules
 ≡(                    # et pour chaque groupe…
-  ⊔                   # on ouvre la boîte
+  °□                   # on ouvre la boîte
   ♭regex "\\d+ [rgb]"  # on ne conserve que le nombre et la première lettre
-  ⊔⊢                  # on prend la première chaîne trouvée par regex, on la déballe
-  { ⊃(⊢⇌|parse⇌↘2⇌) } # on extrait la lettre, et le nombre
+  °□⊢                  # on prend la première chaîne trouvée par regex, on la déballe
+  { ⊃(⊢⇌|⋕⇌↘2⇌) } # on extrait la lettre, et le nombre
 )
 ```
 
@@ -113,10 +113,10 @@ Voyons le cas simple où il y a bien un élément `r` :
 ```
 [{ @b 3 } { @r 4 }]
 .      # on duplique la liste de paires
-≡(⊔⊢⊔) # on extrait la lettre de chaque paire
+≡(°□⊢°□) # on extrait la lettre de chaque paire
 ⊗@r    # on trouve la position du "r"
 ⊡      # on prend la paire correspondante
-⊔⊡1⊔   # on en extrait le nombre associé
+°□⊡1°□   # on en extrait le nombre associé
 ```
 
 Et quand il n'y a pas de `r` ? Le code ci-dessus va échouer puisque `indexof` quand il ne trouve pas l'élément recherché, renvoie un indice qui est au-delà de la fin du tableau, donc `pick` déclenche une erreur.
@@ -126,15 +126,15 @@ Plutôt que de faire quelque chose d'intelligent, je vais chercher `try` qui per
 ```
 [{ @b 3 } { @g 5 }]
 .      # on duplique la liste de paires
-≡(⊔⊢⊔) # on extrait la lettre de chaque paire
-⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)
+≡(°□⊢°□) # on extrait la lettre de chaque paire
+⍣(°□⊡1°□⊡⊗@r)(⋅⋅⋅0)
 ```
 
 Bon, il faut bien sûr faire la même chose avec `g` et `b`, c'est un travail pour `fork` et on met le résultat dans un tableau en entourant de `[]` :
 
 ```
 [{ @b 3 } { @r 4 }]
-[ ⊃(⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@g)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@b)(⋅⋅⋅0))≡(⊔⊢⊔). ]
+[ ⊃(⍣(°□⊡1°□⊡⊗@r)(⋅⋅⋅0)|⍣(°□⊡1°□⊡⊗@g)(⋅⋅⋅0)|⍣(°□⊡1°□⊡⊗@b)(⋅⋅⋅0))≡(°□⊢°□). ]
 ```
 
 C'est atroce mais au moins on a le résultat souhaité. Je nomme cette fonction `ExtractRGB` et je décide de ne plus jamais la regarder.
@@ -144,8 +144,8 @@ C'est atroce mais au moins on a le résultat souhaité. Je nomme cette fonction 
 On peut maintenant combiner tout ça pour analyser une partie, j'appelle ça `ParseGame` :
 
 ```
-ExtractRGB ← [⊃(⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@g)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@b)(⋅⋅⋅0))≡(⊔⊢⊔).]
-ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢♭regex "\\d+ [rgb]"⊔)♭regex "[^,]+" ⊔)♭regex "[^;]+" ↘8
+ExtractRGB ← [⊃(⍣(°□⊡1°□⊡⊗@r)(⋅⋅⋅0)|⍣(°□⊡1°□⊡⊗@g)(⋅⋅⋅0)|⍣(°□⊡1°□⊡⊗@b)(⋅⋅⋅0))≡(°□⊢°□).]
+ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|⋕⇌↘2⇌)}°□⊢♭regex "\\d+ [rgb]"°□)♭regex "[^,]+" °□)♭regex "[^;]+" ↘8
 
 $ Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 ParseGame
@@ -155,7 +155,7 @@ Je suis déjà au bout de ma vie mais je n'ai même pas encore calculé le résu
 
 Heureusement, maintenant ça promet d'être simple. On arrive enfin dans la zone de confort d'un langage comme Uiua.
 
-Pour comparer une liste représentant un tour comme `4_3_20` aux limites qui sont `12_13_14` il suffit d'utiliser `≤` :
+Pour comparer une liste représentant un tour comme `4_3_20` aux limites qui sont `12_13_14` il suffit d'utiliser `less or equal` :
 
 ```
 ≤12_13_14 4_3_20
@@ -191,9 +191,9 @@ On y est presque pour la partie 1. Je sais déterminer si une partie est possibl
 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
-ExtractRGB ← [⊃(⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@g)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@b)(⋅⋅⋅0))≡(⊔⊢⊔).]
-ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢♭regex "\\d+ [rgb]"⊔)♭regex "[^,]+" ⊔)♭regex "[^;]+" ↘8
-Parse ← ≡(□ ParseGame ⊔) Lines
+ExtractRGB ← [⊃(⍣(°□⊡1°□⊡⊗@r)(⋅⋅⋅0)|⍣(°□⊡1°□⊡⊗@g)(⋅⋅⋅0)|⍣(°□⊡1°□⊡⊗@b)(⋅⋅⋅0))≡(°□⊢°□).]
+ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|⋕⇌↘2⇌)}°□⊢♭regex "\\d+ [rgb]"°□)♭regex "[^,]+" °□)♭regex "[^;]+" ↘8
+Parse ← ≡(□ ParseGame °□) Lines
 IsPossible ← /↧♭≡(≤12_13_14)
 
 $ Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
@@ -201,7 +201,7 @@ $ Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 $ Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 
 Parse           # on analyse les parties
-≡(IsPossible ⊔) # on vérifie si chaque partie est possible
+≡(IsPossible °□) # on vérifie si chaque partie est possible
 ```
 
 Me voilà avec un tableau booléen de la forme `[ 1 1 0 1 0 ]`. L'énoncé demande d'additioner les numéros de parties possibles. Il faut donc que je reconstitue les numéros de partie que j'ai décidé plus haut de rendre implicites.
@@ -227,12 +227,12 @@ Il ne reste qu'à faire la somme avec encore un `reduce` appliqué à `add`, et 
 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
-ExtractRGB ← [⊃(⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@g)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@b)(⋅⋅⋅0))≡(⊔⊢⊔).]
-ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢♭regex "\\d+ [rgb]"⊔)♭regex "[^,]+" ⊔)♭regex "[^;]+" ↘8
-Parse ← ≡(□ ParseGame ⊔) Lines
+ExtractRGB ← [⊃(⍣(°□⊡1°□⊡⊗@r)(⋅⋅⋅0)|⍣(°□⊡1°□⊡⊗@g)(⋅⋅⋅0)|⍣(°□⊡1°□⊡⊗@b)(⋅⋅⋅0))≡(°□⊢°□).]
+ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|⋕⇌↘2⇌)}°□⊢♭regex "\\d+ [rgb]"°□)♭regex "[^,]+" °□)♭regex "[^;]+" ↘8
+Parse ← ≡(□ ParseGame °□) Lines
 IsPossible ← /↧♭≡(≤12_13_14)
 
-PartOne ← /+▽:+1⇡⧻.≡(IsPossible ⊔) Parse
+PartOne ← /+▽:+1⇡⧻.≡(IsPossible °□) Parse
 
 $ Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 $ Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
@@ -271,13 +271,13 @@ La partie 2 s'exprime donc plus simplement que la partie 1, finalement :
 
 ```
 Lines ← ⊕□⍜▽¯:\+.=, @\n
-ExtractRGB ← [⊃(⍣(⊔⊡1⊔⊡⊗@r)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@g)(⋅⋅⋅0)|⍣(⊔⊡1⊔⊡⊗@b)(⋅⋅⋅0))≡(⊔⊢⊔).]
-ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|parse⇌↘2⇌)}⊔⊢♭regex "\\d+ [rgb]"⊔)♭regex "[^,]+" ⊔)♭regex "[^;]+" ↘8
-Parse ← ≡(□ ParseGame ⊔) Lines
+ExtractRGB ← [⊃(⍣(°□⊡1°□⊡⊗@r)(⋅⋅⋅0)|⍣(°□⊡1°□⊡⊗@g)(⋅⋅⋅0)|⍣(°□⊡1°□⊡⊗@b)(⋅⋅⋅0))≡(°□⊢°□).]
+ParseGame ← ≡(ExtractRGB≡({⊃(⊢⇌|⋕⇌↘2⇌)}°□⊢♭regex "\\d+ [rgb]"°□)♭regex "[^,]+" °□)♭regex "[^;]+" ↘8
+Parse ← ≡(□ ParseGame °□) Lines
 
 GamePower ← /×/↥
 
-PartTwo ← /+≡(GamePower ⊔) Parse
+PartTwo ← /+≡(GamePower °□) Parse
 
 $ Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 $ Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue

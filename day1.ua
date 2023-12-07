@@ -1,8 +1,8 @@
 Lines ← &i "tools.ua" "Lines"
 Aeq ← ⍤⊃($"expected _ got _")≍
 
-PartOneLine ← parse ⊟⊃(⊢|⊢⇌)▽↧⊃(≥@0|≤@9).⊔
-PartOne ← /+≡(PartOneLine ⊔)Lines
+PartOneLine ← ⋕ ⊟⊃(⊢|⊢⇌)▽↧⊃(≥@0|≤@9).°□
+PartOne ← /+≡(PartOneLine °□)Lines
 
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
           "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"}
@@ -10,13 +10,13 @@ DigitRE ← ⊐/⊂↘1♭≡⊂ "|"Digits
 Xeger ← ≡⇌♭regex ∩⇌
 
 PartTwoLine ← (
-  ⊔
+  °□
   ⊟⊃(
     ⊢♭regex DigitRE
   | ⊢Xeger DigitRE
   )
   +@0≡((∘|-9)>9. ⊗ : Digits)
-  parse
+  ⋕
 )
 PartTwo ← /+≡PartTwoLine Lines
 
