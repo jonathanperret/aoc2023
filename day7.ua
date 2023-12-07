@@ -33,21 +33,10 @@ PartOne ← (
 ParseHandTwo ← ⊗:"0J23456789TQKA"
 ParseTwo ← ⊜(⊓ParseHandTwo ⋕ ⊃(↙5|↘6)) ≠@\n.
 
-SubAllJokers ← (
-  =1.
-  ∩¤
-  +2⇡12
-  ≡(
-    ⍜(⊙▽∘)≡(⊓∘;)
-  )
-)
 BestGroups ← (
-  SubAllJokers
-  ≡Groups
-  .
-  ⍖
-  ⊢
-  ⊡
+  =1.
+  ⊃(Groups ▽¬|/+)
+  ⍜⊢+
 )
 AddBestGroups ← (
   BestGroups.
@@ -94,23 +83,8 @@ $ T55J5
 ParseHandTwo
 Aeq 10_5_5_1_5
 
-10_5_5_1_1
-SubAllJokers
-
-Aeq [10_5_5_2_2
-     10_5_5_3_3
-     10_5_5_4_4
-     10_5_5_5_5
-     10_5_5_6_6
-     10_5_5_7_7
-     10_5_5_8_8
-     10_5_5_9_9
-     10_5_5_10_10
-     10_5_5_11_11
-     10_5_5_12_12
-     10_5_5_13_13]
-
 Aeq 4_1_0_0_0 BestGroups 10_5_5_1_1
+Aeq 5_0_0_0_0 BestGroups 1_1_1_1_1
 
 Aeq 4_1_0_0_0_1_10_5_5_1 AddBestGroups 1_10_5_5_1
 
