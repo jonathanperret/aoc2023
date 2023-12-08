@@ -13,40 +13,75 @@ Parse ← (
       ≥0-@A.
       ⊜∘
     )
-  )
-)
-
-Step ← (
-  ⊙(
-    ⊙(≡⊢.)
-    ⊗
-    ⊡⊙.
-  )
-  ⊡+1
-)
-Walk ← (
-  ⊙["AAA"]
-
-  ∧(
-    ⊃(
-      ⋅∘
-    | ⊙(⊢⇌)
-      Step
+    ≡⊢.
+    ⊃∘(
+      ¤
+      ≡(
+        ⊙∘
+        ⊗:
+        ↘1
+      )
     )
-    ⊂
   )
+)
+
+MakeMatrices ← (
+  ⊙⊙(
+    ⍉
+    ≡(⬚0≡°⊚)
+  )
+)
+Step ← (
+  ⊃(
+    :⊙⊙;
+    ⊙⊡
+    ×
+    /↥
+  | ⋅⋅⊙∘
+  )
+)
+Included ← (
+  ⊙¬
+  ×
+  /↥
+  ¬
+)
+Iter ← (
+  ⊃(
+    +1
+    ⊙∘
+  | ⊙(⧻.)
+    :
+    ◿
+    ⊡
+    Step
+  )
+)
+FindSingleStartEnd ← (
+  ⊃(≡(≍ "AAA")|≡(≍ "ZZZ"))
 )
 PartOne ← (
   Parse
-  ↯[100000]
-  Walk
-  ?
-  ⊙;
-  ⊗ "ZZZ"
+  MakeMatrices
+  ⊙FindSingleStartEnd
+  0
+  ⍢Iter(¬⋅⋅Included)
+  ⊙⋅⋅⋅;
+)
+PartTwo ← (
+  Parse
+  MakeMatrices
+  ⊙(
+    ≡(⊢⇌)
+    ⊃(=@A|=@Z)
+  )
+  0
+  ⍢Iter(¬⋅⋅Included)
+  ⊙⋅⋅⋅;
 )
 ---
 $ RL
-$ 
+$
 $ AAA = (BBB, CCC)
 $ BBB = (DDD, EEE)
 $ CCC = (ZZZ, GGG)
@@ -54,18 +89,34 @@ $ DDD = (DDD, DDD)
 $ EEE = (EEE, EEE)
 $ GGG = (GGG, GGG)
 $ ZZZ = (ZZZ, ZZZ)
-# Aeq 2 PartOne
+Aeq 2 PartOne
 
 $ LLR
-$ 
+$
 $ AAA = (BBB, BBB)
 $ BBB = (AAA, ZZZ)
 $ ZZZ = (ZZZ, ZZZ)
-# Aeq 6 PartOne
+Aeq 6 PartOne
+
+[0 0 1 0 0 0 1 0]
+[1 0 0 1 0 0 0 0]
+Aeq 0 Included
+
+$ LR
+$ 
+$ aaA = (aaB, XXX)
+$ aaB = (XXX, aaZ)
+$ aaZ = (aaB, XXX)
+$ bbA = (bbB, XXX)
+$ bbB = (bbC, bbC)
+$ bbC = (bbZ, bbZ)
+$ bbZ = (bbB, bbB)
+$ XXX = (XXX, XXX)
+Aeq 6 PartTwo
 
 &p "Tests OK"
 
 ---
 
-Aeq 0 PartOne &fras "day8.txt"
-# Aeq 0 PartTwo &fras "day8.txt"
+# Aeq 18023 PartOne &fras "day8.txt"
+Aeq 0 PartTwo &fras "day8.txt"
