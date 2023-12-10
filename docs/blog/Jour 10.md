@@ -144,7 +144,7 @@ Neighbors ← (
   ⊙TryPick.
   ⊙Directions
   ¤
-  ≡+
+  +
 )
 
 ["..F7."
@@ -185,7 +185,7 @@ Neighbors ← (
   ⊙TryPick.
   ⊙Directions
   ¤
-  ≡+
+  +
 )
 
 # FirstStep reçoit la coordonnée de S et la matrice, et renvoie
@@ -227,8 +227,7 @@ FindNext ← (
   | ∘   # on conserve la liste des voisins
   )
   ▽ # on filtre la liste des voisins
-  # on renvoie le premier
-  ⊢
+  ⊢ # on renvoie le premier
 )
 
 # Step prend la position courante, la position précédente et
@@ -242,14 +241,14 @@ Step ← ⊃(
 # HasArrived prend la position courante, la position précédente et
 # la matrice. Elle renvoie 1 si la position courante est sur `S`.
 HasArrived ← (
-  ⊙⋅∘ # drop previous
+  ⊙⋅∘ # on enlève la position précédente
   TryPick
   =@S
 )
 
 # WalkLoop prend la position d'un voisin de `S`,
-# la position de `S` et la matrice, c'est-à-dire l'état
-# après le premier pas.
+# la position de `S` et la matrice. C'est-à-dire l'état
+# de la pile après le premier pas.
 # Elle parcourt la boucle et renvoie le nombre de pas nécessaire
 # pour arriver à `S`.
 WalkLoop ← (
@@ -396,10 +395,14 @@ Je vais utiliser cette matrice binaire pour filtrer la matrice d'origine. Attent
  1_1_1_1_1_0
  1_1_0_0_0_0]
 
-°⊟△       # récupérer la forme de la matrice binaire
-⊙(≡↙¤)    # tronquer chaque ligne
-↙         # éliminer les lignes en trop
-(⋅@.|∘) : # remplacer les caractères hors boucle par `.`
+Crop ← (
+  °⊟△    # récupérer la taille de la première matrice
+  ⊙(≡↙¤) # tronquer chaque ligne de la deuxième
+  ↙      # enlever les lignes en trop
+)
+
+⊃(∘|Crop) # tronquer la matrice de caractères à la même taille
+(@.|∘)    # remplacer les caractères hors boucle par `.`
 ```
 
 Me voici donc avec une matrice ne contenant des caractères "tuyaux" que sur les cellules de la boucle.
@@ -499,7 +502,7 @@ LetterFromDirections ← ⊡:Letters ↧⊃(⊗□|⊗□⇌): Directions
 
 TryPick ← (⋅⋅@.|⊡) /↧ ≥ 0_0 .
 
-Neighbors ← (↯ 0_2 []⋅;|+ ¤) ±⧻, ⊙DirectionsFromLetter ⊙TryPick.
+Neighbors ← +¤ ⊙DirectionsFromLetter ⊙TryPick.
 
 FirstStep ← ⊢ ▽ ≡(∊: °□) ⊙(¤:) ⊃(≡(□Neighbors) ⊙(¤;)|⊙∘) ⊃(Neighbors|⊙∘)
 
@@ -510,8 +513,8 @@ CollectLoop ← ⊙⋅⋅; ⍢(⊃(⊂|⋅Step)) (¬⋅HasArrived) ¤,
 
 GetStartDirections ← ⊟ ⊃(-|-⊙;) ⊃(⊢|⊡1|⊢⇌)
 FixStart ← ⍜⊡(;) ⊙: : ⊙⊢ LetterFromDirections GetStartDirections.
-Crop ← ↙ ⊙(≡↙¤)°⊟
-KeepLoopOnly ← (@.|∘) ⊃(∘|Crop△) °⊚
+Crop ← ↙ ⊙(≡↙¤) °⊟△
+KeepLoopOnly ← (@.|∘) ⊃(∘|Crop) °⊚
 
 CountInside ← ⍤⊃⋅∘≍ 0 ∧(((⊙∘|⊙+.)=@.|⊓;¬) ∊:"F7|".) ⊙(0 0)
 
@@ -542,3 +545,57 @@ $ L7JLJL-JLJLJL--JLJ.L
 
 ⍤⊃⋅∘≍ 10 PartTwo
 ```
+
+## En bonus, une solution dans Gimp
+
+Les quelques visualisations que j'ai faites en prenant des copies d'écran de mon terminal m'ont donné l'idée de voir si le problème pouvait être entièrement résolu dans un éditeur d'image.
+
+Pour commencer, comme je l'avais fait plus tôt, je remplace les lettres représentant des tuyaux et le sol par des caractères plus adaptés comme `┘└┐┌│─•`, `S` par `█`, et je fais cette copie d'écran (en m'étant assuré de désactiver l'anti-crénelage dans le rendu du texte) :
+
+![](day10-grid.png)
+
+Puis je remplace tous les caractères du fichier par le caractère `•` et je fais cette deuxième copie d'écran :
+
+![](day10-dots.png)
+
+J'ouvre ensuite un logiciel d'édition d'image (Gimp). Je commence par utiliser l'outil de sélection "baguette magique", réglé pour ne sélectionner que les pixels contigus exactement de la même couleur que celui que je clique. Je clique sur la case de départ : toute la boucle est sélectionnée.
+
+J'inverse la sélection et je remplis tout le reste de l'image en noir :
+
+![](day10-loop.png)
+
+Ensuite je re-sélectionne la boucle et j'utilise la fonction `Select -> Grow…` pour augmenter son épaisseur :
+
+![](day10-grown-loop.png)
+
+Je charge maintenant ma grille de `•` que je superpose à cette dernière image :
+
+![](day10-grown-loop-over-dots.png)
+
+Je change le mode de mélange des couches à `Multiply` pour obtenir :
+
+![](day10-onloop.png)
+
+OK, seuls les points qui sont sur la boucle sont restés allumés. Mais je ne vais pas les compter à la main, si ?
+
+Heureusement Gimp a une fonction "histogramme", qui permet de savoir combien pixels sont présents dans l'image pour chaque niveau de luminosité.
+
+![](day10-histogram.png)
+
+Ici, je vois que cette dernière image contient `170448` pixels blancs. Combien de cellules est-ce que cela représente ?
+
+Pour le savoir, je reviens à mon image remplie de points et je regarde l'histogramme. Elle contient `235200` pixels blancs et représente `140` par `140` cellules.
+
+Je peux donc appliquer une "règle de trois" : `140 * 140 * 170448 / 235200`, ce qui me donne `14204`.
+
+Connaissant maintenant la longueur de la boucle, je peux répondre à la question de la partie 1 en divisant cette longueur par 2 : `7102` est la bonne réponse !
+
+Pour la partie 2, en plus de sélectionner les pixels de la boucle, je sélectionne les pixels de l'extérieur (toujours avec la "baguette magique). Puis j'agrandis de nouveau cette sélection de quelques pixels. Enfin, j'inverse les couleurs de l'image.
+
+![](day10-inside-mask.png)
+
+En combinant de la même façon ce masque avec la grille de points, je me retrouve avec les cellules englobées par la boucle.
+
+![](day10-inside.png)
+
+L'histogramme m'indique que `4356` pixels blancs subsistent. Je calcule donc `140 * 140 * 4356 / 235200` et j'obtiens bien la réponse de `363` !
