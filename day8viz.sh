@@ -1,0 +1,1 @@
+<day8.txt rg '(...) = \((...), (...)\)' -r '$1 $2 $3' | awk 'BEGIN{print "digraph{ rankdir=\"LR\";ordering=\"out\""} /^..A/ { printf "\"%s\" [rank=1]\n", $1 } { printf "\"%s\" -> \"%s\" [color=red%s]\n", $1, $2, (NR>700?"":""); printf "\"%s\" -> \"%s\" [color=green%s]\n", $1, $3, (NR>700?",constraint=false":""); } END { print "}"}'|neato -Tsvg > day8.svg
