@@ -41,7 +41,7 @@ TryPick ← (
 Neighbors ← (
   ⊙TryPick.
   ⊙DirectionsFromLetter
-  ≡+¤
+  +¤
 )
 
 # start -- S-neighbor
