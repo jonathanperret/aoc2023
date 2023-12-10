@@ -52,13 +52,19 @@ Il n'y aurait pas de difficulté particulière à implémenter ce parcours, vu q
 
 Je décide de tenter cette approche.
 
+Mais d'abord, je m'amuse à remplacer les lettres par de jolis caractères dans toute l'entrée, je prends une police qui va bien, une copie d'écran de mon terminal, et un coup de remplissage dans un éditeur d'images :
+
+![](day10a.png)
+
+C'est joli mais ça ne me donne pas la longueur de la boucle. Il y aurait probablement quelque chose à tenter en analysant cette image, mais je pense que ce sera plus simple de partir du texte.
+
 Je dois choisir une représentation pour la grille de tuyaux. Le plus important est de pouvoir déterminer si deux cellules sont connectées. Je pourrais remplacer chaque lettre par un masque comme par exemple `[ 1 0 0 1 ]` pour un `J` : passage possible en haut, et à droite (en énumérant les directions dans le sens des aiguilles d'une montre).
 
 Alternativement chaque cellule pourrait contenir une liste des mouvements possibles : pour un `J` ce serait donc la paire `[ [ 0 -1 ] [ -1 0 ] ]`.
 
 Je me dis que je peux stocker la matrice telle quelle puis convertir en directions à la volée.
 
-La lecture de l'entrée est triviale :
+Du coup, la lecture de l'entrée est triviale :
 
 ```
 Parse ← ⊜∘ ≠@\n.
@@ -286,6 +292,12 @@ Je ne suis pas très content de mon implémentation, j'ai l'impression d'avoir p
 
 On me demande maintenant combien de cellules sont enfermées par la boucle.
 
+Si je reprends ma visualisation précédente, je peux faire un _flood fill_ pour voir quelles zones sont concernées :
+
+![](day10b.png)
+
+Attention, sur l'image on a l'impression qu'il y a beaucoup de cases remplies, mais la plupart de cette coloration concerne des espaces entre les tuyaux, qui ne sont pas à prendre en compte pour la solution.
+
 Je crois que je vois comment faire : d'abord, identifier les cellules de la boucle, bien sûr.
 
 Puis je devrais pouvoir parcourir la matrice ligne à ligne, en alternant entre l'extérieur et l'intérieur à chaque fois que je croise la boucle.
@@ -368,7 +380,7 @@ Par exemple :
 °⊚
 ```
 
-Je vais utiliser cette matrice binaire pour filtrer la matrice d'origine. Attention à bien redimensionner la matrice de caractères à la dimension de la matrice binaire, au cas où la boucle ne toucherait pas tous les bords.
+Je vais utiliser cette matrice binaire pour filtrer la matrice d'origine. Attention à bien redimensionner la matrice de caractères à la dimension de la matrice binaire, au cas où la boucle ne toucherait pas tous les bords (ma visualisation me montre qu'elle touche bien les bords dans mon entrée, mais bon).
 
 ```
 ["X.F7.XX"
@@ -438,7 +450,6 @@ Je vois comment faire avec des remplacements par expression régulière, mais je
 Est-ce que je peux trouver une façon de faire sans `regex` ?
 
 Au lieu de faire le remplacement de `└───┐` ou `┌───┘` par `│`, et la suppression de `┌───┐` ou `└───┘`, je pourrais considérer `┌` et `┐` comme `│` (changement de région), et `┘` et `└` comme `─`, c'est-à-dire les ignorer. En effet, cela revient à n'observer que la partie basse de ces caractères, et j'ai l'impression que ça devrait marcher.
-
 
 ```
 CountInside ← (
