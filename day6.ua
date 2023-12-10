@@ -47,26 +47,27 @@ $ Distance:  9  40  200
 Aeq 71530_940200 ParseTwo .
 Aeq 71503 PartTwo
 
-46828479 347152214061471
-
 Width ← 200
-⊓(
-  ×÷:⇡.Width.
-  DistanceFor
-| ×2
-)
-÷:
-⇌÷:⇡.⧻.
 Red ← 1_0.5_0.5
 Green ← 0.5_1_0.5
-⊠(
-  # x y
-  ×⊃(
-    (Red|Green)>0.5;
-  | >
+Draw ← (
+  ⊓(
+    ×÷:⇡.Width.
+    DistanceFor
+  | ×2
   )
+  ÷:
+  ⇌÷:⇡.⧻.
+  ⊠(
+    # x y
+    ×⊃(
+      (Red|Green)>0.5;
+    | >
+    )
+  )
+  &ims
 )
-&ims
+# Draw
 
 &p "Tests OK"
 

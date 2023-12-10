@@ -1,4 +1,4 @@
-Lines ← &i "tools.ua" "Lines"
+Lines ← ⊕□⍜▽¯:\+.=, @\n
 Aeq ← ⍤⊃($"expected _ got _")≍
 
 PartOneLine ← ⋕ ⊟⊃(⊢|⊢⇌)▽↧⊃(≥@0|≤@9).°□
@@ -26,7 +26,7 @@ $ pqr3stu8vwx
 $ a1b2c3d4e5f
 $ treb7uchet
 
-Aeq 142 PartOne .
+Aeq 142 PartOne
 
 Aeq 43 PartTwoLine"abc4one2threexyz"
 
