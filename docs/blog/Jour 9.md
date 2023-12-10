@@ -6,16 +6,16 @@ Je suis quand même content de la façon dont j'ai pu gérer une structure de pi
 
 ## Partie 1
 
-Nous voilà dans une oasis. Et un delta-plane, mais il faut attendre que le vent se lève pour s'en servir.
+Nous voilà dans une oasis. Et il y a un delta-plane qui traîne, mais il faut attendre que le vent se lève pour s'en servir.
 
 En attendant, on fait des "observations écologiques".
 
 Chacune de ces lignes contient l'historique d'une valeur :
 
 ```no_run
-$ 0 3 6 9 12 15
-$ 1 3 6 10 15 21
-$ 10 13 16 21 30 45
+0 3 6 9 12 15
+1 3 6 10 15 21
+10 13 16 21 30 45
 ```
 
 Il faut réussir à prédire la prochaine valeur qui irait sur chaque ligne. Là comme ça, avant d'avoir lu la suite de l'énoncé, je dirais `18` pour la première ligne, mais ensuite… la deuxième me rappelle quelque chose ?
@@ -55,10 +55,11 @@ Parse
 
 Je constate que je n'ai même pas besoin de boîtes, puisque toutes les (`200`) lignes ont le même nombre d'éléments (`20`). J'aperçois aussi des nombres conséquents comme `10231852` qui laissent présager une bonne prise de tête en partie 2.
 
-Mais d'ici là, calculons des différences consécutives. C'est quelque chose que j'ai fait hier. J'avais utilisé `windows` mais j'essaie autre chose : décaler la liste puis la soustraire à elle-même :
+Mais d'ici là, calculons des différences consécutives. C'est quelque chose que j'ai fait hier. J'avais utilisé `windows` mais j'essaie autre chose : décaler la liste puis la soustraire à elle-même.
 
 ```
 Deltas ← -⊃(⍜⇌(↘1)|↘1)
+
 [0 3 6 9 12 15]
 Deltas
 ```
