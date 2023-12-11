@@ -1,5 +1,5 @@
 # Experimental!
-Lines ← &i "tools.ua" "Lines"
+Lines ← ⊕□⍜▽¯:\+.=, @\n
 Aeq ← ⍤⊃($"\nexpected\n_\ngot\n_")≍
 
 ParseSeeds ← (

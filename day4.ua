@@ -1,5 +1,5 @@
 # Experimental!
-Lines ← &i "tools.ua" "Lines"
+Lines ← ⊕□⍜▽¯:\+.=, @\n
 Aeq ← ⍤⊃($"expected _ got _")≍
 
 ParseCard ← (
