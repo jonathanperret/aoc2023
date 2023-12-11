@@ -242,3 +242,35 @@ $ #...#.....
 
 ⍤⊃⋅∘≍ 1030 PartTwo 10
 ```
+
+### Il y avait plus simple…
+
+En réfléchissant un peu plus, je me dis qu'il y a peut-être une relation mathématique entre le résultat de la partie 1 et celui de la partie 2. Il ne s'agit pas simplement de multiplier par un million, mais chaque ligne ou colonne qui a compté double (à cause de l'expansion de l'univers) dans le premier parcours devrait compter un million de fois dans la deuxième partie.
+
+Pour savoir combien de lignes et colonnes ont été comptées deux fois, on peut calculer la somme des distances sur un univers sans expansion et soustraire ça du résultat de la partie 1.
+
+On obtient ensuite le résultat de la partie 2 en multipliant cette différence par `999999`, et en ajoutant les distances dans l'univers non étendu !
+
+```
+Parse ← ⊜(=@#)≠@\n.
+Expand ← ⍥(⍉ ▽ +1 ⊃≡(¬/↥)∘)2
+Distance ← /+⌵-
+SumOfAllDistances ← ÷2/+♭⊠Distance.⊚
+PartOne ← SumOfAllDistances Expand Parse
+PartTwo ← + ⊙×: ⊙(⊃∘- ∩SumOfAllDistances ⊃∘Expand Parse) -1
+
+$ ...#......
+$ .......#..
+$ #.........
+$ ..........
+$ ......#...
+$ .#........
+$ .........#
+$ ..........
+$ .......#..
+$ #...#.....
+
+⍤⊃⋅∘≍ 374 PartOne .
+⍤⊃⋅∘≍ 1030 PartTwo 10 .
+⍤⊃⋅∘≍ 8410 PartTwo 100
+```

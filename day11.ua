@@ -4,18 +4,10 @@ Aeq ← ⍤⊃($"\nexpected\n_\ngot\n_")≍
 Parse ← ⊜(=@#)≠@\n.
 Expand ← ⍥(⍉ ▽ +1 ⊃≡(¬/↥)∘)2
 Distance ← /+⌵-
-AllDistances ← ⊠Distance.
-SumOfAllDistances ← ÷2/+♭AllDistances
-PartOne ← SumOfAllDistances ⊚ Expand Parse
-ExpandN ← (
-  -1
-  ⊃(⋅⊚|⊙∘|⊙⍉)
-  ⊙∩(¤ × ⊙(\+ ≡(¬/↥)))
-  ⊃∘≡⍜°⊟ ⊃(⊡ ⊙⋅∘|⊡ ⋅⊙⋅∘)
-  +
-)
+SumOfAllDistances ← ÷2/+♭⊠Distance.⊚
+PartOne ← SumOfAllDistances Expand Parse
+PartTwo ← + ⊙×: ⊙(⊃∘- ∩SumOfAllDistances ⊃∘Expand Parse) -1
 
-PartTwo ← SumOfAllDistances ExpandN ⊙Parse
 ---
 Aeq 9 Distance 6_1 11_5
 
@@ -48,12 +40,6 @@ Expand
 Aeq
 
 ⍤⊃⋅∘≍ 374 PartOne .
-
-[1_0_0
- 0_0_0
- 0_0_0
- 0_0_1]
-Aeq ⊃(Expand|°⊚ ExpandN 2)
 
 Aeq 1030 PartTwo 10 .
 Aeq 8410 PartTwo 100
