@@ -366,5 +366,7 @@ $ ZZZ = (ZZZ, ZZZ)
 
 ### La vraie Partie 2
 
+En attendant que je rédige ça, une petite visualisation :
+![](day8.svg)
 
 #### fin
