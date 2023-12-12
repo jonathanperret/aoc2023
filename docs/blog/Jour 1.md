@@ -4,7 +4,7 @@ Youpi, il est de nouveau temps d'aider les Elfes.
 
 On commence avec une chaîne composée de lignes comme ça :
 
-```
+```no_run
 $ 1abc2
 $ pqr3stu8vwx
 $ a1b2c3d4e5f
@@ -185,7 +185,7 @@ DigitRE ← ⊐/⊂↘1♭≡⊂ "|" Digits
 DigitRE
 ```
 
-En fait il y avait plus simple en utilisant les "chaînes à trous" de Uiua, c'est-à-dire que `$"hello, _"` crée une fonction qui si on lui passe `"world"` renvoie `hello, world`. La fonction `$"_|_"` appliquée à deux chaînes les concatène donc en les séparant par un caractère `|`. Il n'y a plus qu'à appliquer cette fonction de façon répétée avec `reduce`. Il reste une petite subtilité parce que `Digits` reste une liste de boîtes, pas de chaînes, et on veut passer des chaînes à `$"_|_"`. On peut s'en sortir en écrivant `$"_|_"∩°□`, qui utilise `both` et `un``box` pour "déballer" les deux arguments, ou bien on peut utiliser `pack` qui est un modificateur un peu magique censé automatiquement emballer/déballer les valeurs quand il le faut. En tout cas, ici ça marche 🤷.
+En fait il y avait plus simple en utilisant les "chaînes à trous" de Uiua, c'est-à-dire que `$"hello, _"` crée une fonction qui si on lui passe `"world"` renvoie `hello, world`. La fonction `$"_|_"` appliquée à deux chaînes les concatène donc en les séparant par un caractère `|`. Il n'y a plus qu'à appliquer cette fonction de façon répétée avec `reduce`. Il reste une petite subtilité parce que `Digits` reste une liste de boîtes, pas de chaînes, et on veut passer des chaînes à `$"_|_"`. On peut s'en sortir en écrivant `$"_|_"∩°□`, qui utilise `both` et `un``box` pour "déballer" les deux arguments, ou bien on peut utiliser `unpack` qui est un modificateur un peu magique censé automatiquement emballer/déballer les valeurs quand il le faut. En tout cas, ici ça marche 🤷.
 
 ```
 Digits ← {"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
