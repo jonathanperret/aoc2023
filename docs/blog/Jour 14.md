@@ -19,9 +19,9 @@ O.#..O.#.#
 
 On va jouer à pencher la plate-forme. Pour le moment (c'est que la partie 1, quand même), on ne la penche que vers le Nord. Les pierres qui roulent se déplacent jusqu'à ne plus pouvoir bouger. Et il faut ensuite faire un calcul en fonction de leurs positions.
 
-La "vraie" plate-forme fait `100x100` cases.
+La "vraie" plate-forme fait `100x100` cases et contient `2045` caractères `O`.
 
-Lecture de l'entrée, on sépare juste les lignes :
+En guise de lecture de l'entrée, on sépare juste les lignes :
 
 ```
 Parse = ⊜∘ ≠@\n.
@@ -39,13 +39,160 @@ $ #OO..#....
 Parse
 ```
 
-Ensuite, quelle est la position finale de chaque `O` ? Je pense que c'est la position du dernier `#` qui le précède (je peux ajouter une rangée de `#` au début pour éviter le cas particulier), plus le nombre de `O` entre lui et ce `#`.
+Ensuite, quelle est la position finale de chaque `O` ? Je pense que c'est la position du dernier `#` qui le précède (je peux ajouter une rangée de `#` au début pour éviter le cas particulier), plus le nombre de `O` entre lui et ce `#`, plus `1`.
 
 Ah, mais si je partage chaque colonne en groupes séparés par les `#`, il me suffirait de trier les intervalles pour avoir tous les `O` avant les `.`. Je n'ai pas besoin d'ajouter des `#` en haut, d'ailleurs.
 
-D'abord je vais transposer la matrice avec `transpose` pour que les colonnes deviennent des lignes. Puis je pourrai utiliser `under``partition` qui me permettra de travailler sur les intervalles entre les `#`, puis reconstituera la ligne originale en réinsérant les `#`.
+D'abord je vais transposer la matrice avec `transpose` pour que les colonnes deviennent des lignes. Puis je pourrai un modificateur magique de Uiua.
 
-J'arrive à ça :
+### La magie de `under`
+
+`under` c'est un peu la récompense de l'effort nécessaire pour apprendre à travailler dans un langage comme Uiua (ou ses ancêtres comme APL).
+
+L'idée, c'est que `⍜ F G` applique une première fonction (`F`) à une valeur, puis une deuxième fonction (`G`), et enfin "annule" les effets de la première fonction (`F`).
+
+Prenons un exemple simple : je veux multiplier un nombre par `1000` (donc `* 1000`), lui ajouter `1` (`+ 1`), puis le re-diviser par `1000` :
+
+```
+1234
+⍜(× 1000) (+ 1)
+```
+
+Comme ça, ça ne paraît pas très utile, mais par exemple, si au lieu d'ajouter `1` à mon nombre, j'appliquais `round` ?
+
+```
+1.234567
+⍜(× 1000) ⁅
+```
+
+Et voilà comment j'arrondis un nombre à 3 chiffres après la virgule.
+
+On peut faire des choses plus compliquées bien sûr avec `under`. Par exemple si je veux enlever les deux _derniers_ éléments d'un tableau, je peux utiliser `drop` à l'intérieur d'un `under``reverse`  :
+
+```
+1_2_3_4_5_6
+⍜⇌ (↘2)
+```
+
+Si je veux enlever la première colonne d'une matrice, `drop` dans `under``transpose` :
+
+```
+[1_2_3
+ 4_5_6
+ 7_8_9]
+⍜⍉ (↘1)
+```
+
+Je peux aussi utiliser `under` avec des opérations qui réduisent la taille d'un tableau. Par exemple, doubler le premier élément :
+
+```
+1_2_3
+⍜⊢ (×2)
+```
+
+Ou encore, diviser par 2 les éléments supérieurs à 10, avec `under``keep`  :
+
+```
+1_2_3_5_8_26_42
+>10. # crée un masque des nombres >10
+⍜▽(÷2)
+```
+
+Cette dernière opération aurait pu être réalisée sans `under`, en parcourant les éléments et en utilisant une _switch function_ par exemple. Mais ça aurait été moins concis.
+
+Mais avec `under``partition` on peut faire des choses qui seraient vraiment compliquées à faire autrement.
+
+Pour rappel, `partition` (dans sa version la plus simple, qui nous suffit ici) prend une fonction, et deux tableaux de même taille : le premier est un masque (`0` et `1`) qui va permettre de sélectionner les éléments du deuxième. Mais à la différence de `keep`, qui va simplement conserver tous les éléments placés en face d'un `1`, `partition` va repérer chaque séquence de `1` consécutifs et en faire autant de sous-tableaux qui seront successivement passés à la fonction donnée en argument.
+
+Un exemple où la fonction appliquée à chaque sous-tableau est `length` :
+
+```
+9_9_9_9_9_9_9_9_9_9 # peu importe le contenu de ce tableau ici
+0_1_1_1_0_0_1_1_0_1 # le tableau de masque va diriger le découpage
+⊜⧻
+```
+
+En général, le tableau de masque est obtenu en appliquant un test sur un tableau existant. Typiquement, cela permet de découper une chaîne comme je l'ai fait depuis le début du calendrier. Ici on veut simplement que les sous-tableaux deviennent des lignes dans le tableau final (ce qui est possible avec cette chaîne parce qu'ils auront tous la même longueur), donc la fonction passée à `partition` est simplement `identity` :
+
+```
+"abc,def,ghi"
+≠@,. # masque des caractères autres que ","
+## [1 1 1 0 1 1 1 0 1 1 1]
+⊜∘
+```
+
+On arrive petit à petit à notre problème de pierres qui roulent. Un masque pour trouver les séquences de caractères autres que les `#`, c'est facile. En revanche, comme ces séquences ne sont pas toutes de la même longueur, je dois appliquer `box` pour qu'elles puissent cohabiter dans le tableau résultat :
+
+```
+$ O.#..O.#.#
+≠@#. # masque des caractères autres que "#"
+## [1 1 0 1 1 1 1 0 1 0]
+⊜□
+```
+
+Très bien, et sur chaque séquence, comment faire rouler les pierres vers la gauche ? En fait ce qu'on veut, c'est faire un tri ! Dans l'ordre ASCII, `O` vient après `.`. Donc si je fais un tri descendant d'une chaîne comme `..O.`, j'obtiendrai bien `O...`.
+
+Pour les tris, en Uiua on utilise `rise` ou `fall`, qui génèrent des listes d'indices correspondant à l'ordre dans lequel il faudrait prendre les éléments du tableau source pour en obtenir une version triée. Et ensuite on peut utiliser `select` qui sert justement à prendre des éléments par indice.
+
+```
+$ ..O.
+⍖.
+## [2 0 1 3]
+⊏
+```
+
+Je peux donc appliquer ce tri sur chacune des séquences extraites par `partition`, avec `rows` :
+
+```
+$ O.#..O.#.#
+≠@#. # masque des caractères autres que "#"
+## [1 1 0 1 1 1 1 0 1 0]
+⊜□
+## [⌜O.⌟ ⌜..O.⌟ ⌜.⌟]
+≡(
+  °□  # déballer la chaîne
+  ⊏⍖. # tri descendant
+  □   # remballer
+)
+```
+
+Comme on travaille sur un tableau de boîtes, il faut bien penser les ouvrir avec `un``box` avant de manipuler leur contenu (la chaîne `.O..`) puis les remballer avec `box` pour qu'elles puissent continuer de cohabiter.
+
+Tiens, ne serait-ce pas un cas où `under` pourrait nous aider ? Si, bien sûr. On peut écrire ça plutôt comme ceci :
+
+```
+$ O.##..O.#.#
+≠@#. # masque des caractères autres que "#"
+## [1 1 0 0 1 1 1 1 0 1 0]
+⊜□
+## [⌜O.⌟ ⌜..O.⌟ ⌜.⌟]
+≡(
+  ⍜°□ (⊏⍖.) # tri descendant, "à l'intérieur" des boîtes
+)
+```
+
+OK, on n'a même pas économisé de caractères, mais je trouve ça quand même intéressant. Mais on n'a pas fini de voir ce que `under` peut faire.
+
+En effet, maintenant qu'on a trié nos sous-chaînes, il faudrait remettre en place nos cailloux carrés (les `#`). Le problème c'est qu'on ne sait plus combien il y en avait entre chaque groupe ! Par exemple ici il y en avait un à tout à droite, mais pas à gauche. Il y en avait deux entre les deux premiers groupes, un seul entre les deux derniers.
+
+Heureusement il y a `under`. Je vais simplement remplacer mon `partition``box` par `under``partition``box` et passer le reste du traitement comme fonction à `under` :
+
+```
+$ O.##..O.#.#
+≠@#. # masque des caractères autres que "#"
+## [1 1 0 0 1 1 1 1 0 1 0]
+⍜⊜□(
+  # pour chaque séquence de tels caractères
+  ≡(
+    ⍜°□ (⊏⍖.) # tri descendant, "à l'intérieur" des boîtes
+  )
+  # et ensuite under s'occupera de remettre les "#"
+)
+```
+
+Et voilà comment un problème en apparence épineux devient bibliquement simple.
+
+J'utilise encore un `under` (avec `transpose`) pour transposer la matrice pendant l'application des décalages, parce que c'est beaucoup plus simple de travailler sur des lignes que sur des colonnes. Et j'arrive à ça :
 
 ```
 Parse = ⊜∘ ≠@\n.
