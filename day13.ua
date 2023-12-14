@@ -73,23 +73,20 @@ ScoreSmudged ← (
 )
 PartTwoGrid ← (
   .
-  ?⊢ScoreGrid
+  ⊢ScoreGrid
   :
   /×△.
   ⇡
   ⊙¤
   ≡FlipBit
-  &p"OK"
   .
   ≡(□ScoreGridA)
   :
   ≡(□ScoreGridB)
-  &p"OK2"
   ⊂
   /⊐⊂
   ▽±.
   ⊝
-  ?
   :
   ⊙.
   ▽≠
@@ -233,4 +230,4 @@ ParseGrid
 &p "Tests OK"
 ---
 Aeq 28651 PartOne &fras "day13.txt"
-Aeq 0 PartTwo &fras "day13.txt"
+Aeq 25450 PartTwo &fras "day13.txt"
