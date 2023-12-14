@@ -112,7 +112,7 @@ Un exemple où la fonction appliquée à chaque sous-tableau est `length` :
 ⊜⧻
 ```
 
-En général, le tableau de masque est obtenu en appliquant un test sur un tableau existant. Typiquement, cela permet de découper une chaîne comme je l'ai fait depuis le début du calendrier. Ici on veut simplement que les sous-tableaux deviennent des lignes dans le tableau final (ce qui est possible avec cette chaîne parce qu'ils auront tous la même longueur), donc la fonction passée à `partition` est simplement `identity` :
+En général, le tableau de masque est obtenu en appliquant un test sur un tableau existant. Typiquement, cela permet de découper une chaîne comme je l'ai fait depuis le début du calendrier, et encore ci-dessus. Ici on veut simplement que les sous-tableaux deviennent des lignes dans le tableau final (ce qui est possible avec cette chaîne parce qu'ils auront tous la même longueur), donc la fonction passée à `partition` est simplement `identity` :
 
 ```
 "abc,def,ghi"
@@ -156,7 +156,7 @@ $ O.#..O.#.#
 )
 ```
 
-Comme on travaille sur un tableau de boîtes, il faut bien penser les ouvrir avec `un``box` avant de manipuler leur contenu (la chaîne `.O..`) puis les remballer avec `box` pour qu'elles puissent continuer de cohabiter.
+Comme on travaille sur un tableau de boîtes, il faut bien penser les ouvrir avec `un``box` avant de manipuler leur contenu (les chaînes comme `".O.."`) puis les remballer avec `box` pour qu'elles puissent continuer de cohabiter.
 
 Tiens, ne serait-ce pas un cas où `under` pourrait nous aider ? Si, bien sûr. On peut écrire ça plutôt comme ceci :
 
