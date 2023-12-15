@@ -80,7 +80,7 @@ Ensuite il ne me reste qu'à appliquer toutes les instructions en séquence (`fo
 /+ ≡°□ [□1 □2]
 ## 3
 /+ ≡°□ ↙ 0 [□1 □2]
-## [] ;;;
+## []
 ```
 
 Voilà le résultat final :
