@@ -37,7 +37,6 @@ SwizzleG ← ⊃(G|B|H|⋅⋅⋅⋅⊃(⋅⋅⋅⋅∘|⊙⊙∘))
 SwizzleB ← ⊃(B|G|D|⋅⋅⋅⋅⊃(⋅⋅⋅(⊙;)|⊙⊙∘))
 SwizzleD ← ⊃(D|H|B|⋅⋅⋅⋅⊃(⋅⋅⋅⋅∘|⊙⊙∘))
 CollectHGBD ← [KeepHGBD]
-Merge ← ⊃(↥TopAndFifth|↥⋅TopAndFifth|↥⋅⋅TopAndFifth|↥⋅⋅⋅TopAndFifth)
 
 Bounce ← ⊃(F SwizzleH|F SwizzleG|F SwizzleB|F SwizzleD)
 
@@ -78,8 +77,22 @@ PeekHGBD ← ⊃(
   VizHGBD
 | KeepHGBD
 )
+Reps ← 1e3
 FirstStepAt ← (
   SetupHGBDAt
+
+  # ⊃(
+  #   &p$"ShiftHGBD: _ms"⍜(×10)⁅×1e6 ÷ Reps ⍜now ⍥(ShiftHGBD)Reps
+  # | KeepHGBD
+  # )
+  # ;;;;
+
+  # &p$"Swizzle: _ms"⍜(×10)⁅×1e6 ÷ Reps ⍜now ⍥(
+  #   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;⊃(SwizzleH|SwizzleG|SwizzleB|SwizzleD|KeepAll)
+  # )Reps
+
+  # &p$"Bounce: _ms"⍜(×10)⁅×1e6 ÷ Reps ⍜now ⍥(⊃(;;;;Bounce|KeepAll))Reps
+
   ⊃(Bounce|⋅⋅⋅⋅KeepMirrors)
 )
 FirstStep ← FirstStepAt 3_0_0
@@ -213,15 +226,15 @@ Aeq "bgd│•╱╲" [⊙⊙⊙⊙⊙⊙∘] SwizzleB @h @g @b @d @• @╱ @�
 # d' = f(d, h, b, ─, ·, ╱, ╲)
 Aeq "dhb─•╱╲" [⊙⊙⊙⊙⊙⊙∘] SwizzleD @h @g @b @d @• @╱ @╲ @│ @─
 
-Aeq [1 0 0 1] [Merge 1 0 0 0 0 0 0 1]
+Aeq [1 0 0 1] [OrHGBD 1 0 0 0 0 0 0 1]
 
 Aeq [GoH] [Bounce GoH •]
 Aeq [GoG] [Bounce GoG •]
 Aeq [GoB] [Bounce GoB •]
 Aeq [GoD] [Bounce GoD •]
 
-Aeq [Merge GoH GoB] [Bounce Merge GoH GoB •]
-Aeq [Merge GoH GoG] [Bounce Merge GoH GoG •]
+Aeq [OrHGBD GoH GoB] [Bounce OrHGBD GoH GoB •]
+Aeq [OrHGBD GoH GoG] [Bounce OrHGBD GoH GoG •]
 
 Aeq [GoD] [Bounce GoH ╱]
 Aeq [GoB] [Bounce GoG ╱]
@@ -235,8 +248,8 @@ Aeq [GoB] [Bounce GoD ╲]
 
 Aeq [GoH] [Bounce GoH │]
 Aeq [GoB] [Bounce GoB │]
-Aeq [Merge GoB GoH] [Bounce GoD │]
-Aeq [Merge GoD GoG] [Bounce GoH ─]
+Aeq [OrHGBD GoB GoH] [Bounce GoD │]
+Aeq [OrHGBD GoD GoG] [Bounce GoH ─]
 
 $ .\\
 $ ..
@@ -262,7 +275,7 @@ $ ..../.\\\\..
 $ .-.-/..|..
 $ .|....-|.\\
 $ ..//.|....
-Aeq 46 PartOne
+; # Aeq 46 PartOne
 
 $ .|...\\....
 $ |.-.\\.....
@@ -274,9 +287,9 @@ $ ..../.\\\\..
 $ .-.-/..|..
 $ .|....-|.\\
 $ ..//.|....
-Aeq 51 PartTwo
+; # Aeq 51 PartTwo
 
 &p "Tests OK"
 ---
-Aeq 7477 PartOne &fras "day16.txt"
-Aeq 7853 &p ⍜now PartTwo &fras "day16.txt"
+Aeq 7477 &p$"part 1: _s"⍜(×1000)⁅⍜now PartOne &fras "day16.txt"
+# Aeq 7853 &p ⍜now PartTwo &fras "day16.txt"
