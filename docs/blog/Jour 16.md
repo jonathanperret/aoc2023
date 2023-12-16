@@ -557,16 +557,6 @@ KeepAll ← ⊙⊙⊙⊙KeepMirrors
 DropAll ← DropHGBD DropMirrors
 FixMirrors ← ⊙∩∩¤ ¤
 
-• ← 1 0 0 0 0
-╱ ← 0 1 0 0 0
-╲ ← 0 0 1 0 0
-│ ← 0 0 0 1 0
-─ ← 0 0 0 0 1
-GoH ← 1 0 0 0
-GoG ← 0 1 0 0
-GoB ← 0 0 1 0
-GoD ← 0 0 0 1
-
 H ← ∘
 G ← ⋅∘
 B ← ⋅⋅∘
@@ -632,12 +622,6 @@ Solve ← (
 )
 SolveAt ← (
   FirstStepAt
-  Solve
-  # &p.
-)
-PartOne ← (
-  Parse
-  FirstStep
   Solve
 )
 PartTwo ← (
