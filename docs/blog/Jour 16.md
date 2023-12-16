@@ -569,8 +569,6 @@ SwizzleH ← ⊃(H|D|G|⋅⋅⋅⋅⊃(⋅⋅⋅(⊙;)|⊙⊙∘))
 SwizzleG ← ⊃(G|B|H|⋅⋅⋅⋅⊃(⋅⋅⋅⋅∘|⊙⊙∘))
 SwizzleB ← ⊃(B|G|D|⋅⋅⋅⋅⊃(⋅⋅⋅(⊙;)|⊙⊙∘))
 SwizzleD ← ⊃(D|H|B|⋅⋅⋅⋅⊃(⋅⋅⋅⋅∘|⊙⊙∘))
-CollectHGBD ← [KeepHGBD]
-Merge ← ⊃(↥TopAndFifth|↥⋅TopAndFifth|↥⋅⋅TopAndFifth|↥⋅⋅⋅TopAndFifth)
 
 Bounce ← ⊃(F SwizzleH|F SwizzleG|F SwizzleB|F SwizzleD)
 
