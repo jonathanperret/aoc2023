@@ -48,7 +48,7 @@ ShiftD ← ⬚0↻0_¯1
 ShiftHGBD ← ⊓(ShiftH|ShiftG|ShiftB|ShiftD)
 SetupHGBDAt ← (
   ⊙(
-    ⊃(...×0|∘)
+    ⊃(...<0|∘)
     [KeepHGBD]
   )
   ⍜⊡ (⋅1)
@@ -67,9 +67,9 @@ Step ← (
   ⊃(Bounce ShiftHGBD|KeepAll)
   OrHGBD
 )
+Count ← /+♭
 Energized ← ↥↥↥
 PeekEnergized ← ⊃Energized KeepHGBD
-Count ← /+♭
 VizHGBD ← (
   ≡≡°⋯⍉CollectHGBD
   ⊏:" ⫰⊸┘⫯│┐┤⟜└─┴┌├┬┼"
@@ -83,17 +83,20 @@ FirstStepAt ← (
   ⊃(Bounce|⋅⋅⋅⋅KeepMirrors)
 )
 FirstStep ← FirstStepAt 3_0_0
+SignatureHGBD ← +∩(+∩Count)
 RepeatToEnd ← (
-  0
+  ¯1 # prev signature
+  0  # latest signature
   ⍢(
-    # in: last count, 9 matrices
-    # out: last count, 9 new matrices
-    ⊓(+1|Step)
+    ⊙; # drop prev signature
+    ⊙Step
+    ⊙⊃(SignatureHGBD|KeepHGBD)
+    : # shift old sig under new
   )(
-    # in: last count, 9 matrices
-    ⊙(Count Energized)
     ≠
   )
+  ;; # drop signatures
+  ⊃(Count Energized|KeepHGBD)
 )
 Solve ← (
   RepeatToEnd
@@ -133,6 +136,41 @@ PartTwo ← (
   /↥♭
 )
 ---
+$ .|...\\....
+$ |.-.\\.....
+$ .....|-...
+$ ........|.
+$ ..........
+$ .........\\
+$ ..../.\\\\..
+$ .-.-/..|..
+$ .|....-|.\\
+$ ..//.|....
+Parse
+FirstStep
+Aeq ["⟜         "
+     "          "
+     "          "
+     "          "
+     "          "
+     "          "
+     "          "
+     "          "
+     "          "
+     "          "] PeekHGBD
+RepeatToEnd
+Aeq 46
+Aeq ["⟜│⊸⊸⊸⊸    "
+     " ⫯   ⫰    "
+     " ⫯   │─⟜⟜⟜"
+     " ⫯   ⫯⫰   "
+     " ⫯   ⫯⫰   "
+     " ⫯   ⫯⫰   "
+     " ⫯  ⟜┌│⊸  "
+     "⊸─⟜⟜⫰⫯⫯⫰  "
+     " │⊸⊸⊸┐─│  "
+     " ⫯   ⫯ ⫯  "] PeekHGBD
+DropAll
 $ \\.
 $ ..
 Parse
@@ -142,7 +180,6 @@ Aeq 2
 Aeq ["⫯ "
      "⫯ "] PeekHGBD
 DropAll
-
 $ .|
 $ ..
 Parse
@@ -201,53 +238,6 @@ Aeq [GoB] [Bounce GoB │]
 Aeq [Merge GoB GoH] [Bounce GoD │]
 Aeq [Merge GoD GoG] [Bounce GoH ─]
 
-$ .|...\\....
-$ |.-.\\.....
-$ .....|-...
-$ ........|.
-$ ..........
-$ .........\\
-$ ..../.\\\\..
-$ .-.-/..|..
-$ .|....-|.\\
-$ ..//.|....
-Parse
-FirstStep
-Aeq ["⟜         "
-     "          "
-     "          "
-     "          "
-     "          "
-     "          "
-     "          "
-     "          "
-     "          "
-     "          "] PeekHGBD
-⍥Step 8
-Aeq ["⟜│        "
-     " ⫯        "
-     " ⫯        "
-     " ⫯        "
-     " ⫯        "
-     " ⫯        "
-     " ⫯        "
-     " ─        "
-     "          "
-     "          "] PeekHGBD
-RepeatToEnd
-Aeq 46
-Aeq ["⟜│⊸⊸⊸⊸    "
-     " ⫯   ⫰    "
-     " ⫯   │─⟜⟜⟜"
-     " ⫯   ⫯⫰   "
-     " ⫯   ⫯⫰   "
-     " ⫯   ⫯⫰   "
-     " ⫯  ⟜┌│⊸  "
-     "⊸─⟜⟜⫰⫯⫯⫰  "
-     " │⊸⊸⊸┐─│  "
-     " ⫯   ⫯ ⫯  "] PeekHGBD
-DropAll
-
 $ .\\
 $ ..
 Parse
@@ -288,5 +278,5 @@ Aeq 51 PartTwo
 
 &p "Tests OK"
 ---
-# Aeq 7477 PartOne &fras "day16.txt"
-# Aeq 7853 &p ⍜now PartTwo &fras "day16.txt"
+Aeq 7477 PartOne &fras "day16.txt"
+Aeq 7853 &p ⍜now PartTwo &fras "day16.txt"

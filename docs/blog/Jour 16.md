@@ -486,17 +486,22 @@ FirstStep ← (
   SetupHGBD
   ⊃(Bounce|⋅⋅⋅⋅KeepMirrors)
 )
+SignatureHGBD ← +∩(+∩Count)
 RepeatToEnd ← (
+  ¯1
   0
   ⍢(
-    # in: last count, 9 matrices
-    # out: last count, 9 new matrices
-    ⊓(+1|Step)
+    ⊙;
+    ⊙Step
+    ⊙⊃(SignatureHGBD|KeepHGBD)
+    :
   )(
-    # in: last count, 9 matrices
-    ⊙(Count Energized)
     ≠
   )
+  ;;
+  ⊃(Count Energized|KeepHGBD)
+
+  ⊙(&gifs 30 ≡(▽↯⧻,:⍉▽↯⧻,,:10))
 )
 PartOne ← (
   Parse
@@ -542,6 +547,17 @@ Je lance donc le calcul sur ces `440` possibilités et je vais faire autre chose
 Dans l'espoir d'utiliser un peu plus les capacités de calcul de mon ordinateur j'utilise `spawn` pour tester chaque possibilité sur un thread séparé. Effectivement, ça divise le temps par `4` environ, ça valait le coup.
 
 Avec le recul, j'aurais certainement mieux fait de partir sur une solution qui suive chaque rayon (avec des optimisations pour éviter de refaire le même travail plusieurs fois ou même à l'infini). Mais je suis quand même content d'être allé au bout de mon idée.
+
+### Surprise de dernière minute
+
+Alors que je m'apprêtais à poser ce problème pour de bon, en essayant d'ajouter une petite visualisation animée je me suis rendu compte que j'exécutais beaucoup plus d'itérations que nécessaire, parce que je comparais le nombre de cases allumées au nombres d'étapes exécutées (qui n'a aucun intérêt en fait).
+
+Je tente une première correction en arrêtant la boucle dès que le nombre de cases allumées cesse d'augmenter, mais un test qui échoue m'indique que ce n'est pas correct. En effet, un rayon peut entrer dans une case déjà allumée par un autre rayon (qui allait dans une autre direction) et donc ne pas augmenter le nombre de cases allumées, mais ce même rayon peut ensuite aller allumer d'autres cases. Je crée donc la fonction `SignatureHGBD` qui me donne le nombre total de cases à `1` dans les quatre matrices directionnelles. Si ce nombre ne bouge plus alors je suis sûr d'être arrivé au bout.
+
+Les performances sont nettement améliorées : pour la partie 1 on passe de 6 secondes à moins d'une seconde.
+
+Pour la partie 2, avec le parallélisme en threads, on descend à 30 secondes au lieu de 4 minutes. C'est agréable mais on n'arrive quand même pas à quelque chose de compétitif (apparemment les solutions à base de rayons individuels calculent la partie 2 en quelques secondes à peine).
+
 
 ```
 Parse ← (
@@ -606,13 +622,20 @@ FirstStepAt ← (
 )
 FirstStep ← FirstStepAt 3_0_0
 RepeatToEnd ← (
+  ¤.
   0
   ⍢(
-    ⊓(+1|Step)
+    ⊓(+1|∘|Step)
+    ⊙⊃(
+      ⊙Energized
+      ⊂
+    | ⋅KeepHGBD
+    )
   )(
-    ⊙(Count Energized)
+    ⊙⋅(Count Energized)
     ≠
   )
+  ⊙(&gifs 30 ≡(▽↯⧻,:⍉▽↯⧻,,:10))
 )
 Solve ← (
   RepeatToEnd
