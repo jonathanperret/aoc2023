@@ -12,6 +12,7 @@ DropMirrors ← ;;;;;
 KeepMirrors ← ⊙⊙⊙⊙∘
 KeepAll ← ⊙⊙⊙⊙KeepMirrors
 DropAll ← DropHGBD DropMirrors
+FixMirrors ← ⊙∩∩¤ ¤
 
 • ← 1 0 0 0 0
 ╱ ← 0 1 0 0 0
@@ -45,9 +46,16 @@ ShiftG ← ⬚0↻0_1
 ShiftB ← ⬚0↻¯1
 ShiftD ← ⬚0↻0_¯1
 ShiftHGBD ← ⊓(ShiftH|ShiftG|ShiftB|ShiftD)
+SetupHGBDAt ← (
+  ⊙(
+    ⊃(...×0|∘)
+    [KeepHGBD]
+  )
+  ⍜⊡ (⋅1)
+  °[KeepHGBD]
+)
 SetupHGBD ← (
-  ⊃(...×0|∘)
-  ⊙⊙⊙(⍜(⊡0_0)⋅1)
+  SetupHGBDAt 3_0_0
 )
 OrHGBD ← ⊃(
   ↥TopAndFifth
@@ -70,10 +78,11 @@ PeekHGBD ← ⊃(
   VizHGBD
 | KeepHGBD
 )
-FirstStep ← (
-  SetupHGBD
+FirstStepAt ← (
+  SetupHGBDAt
   ⊃(Bounce|⋅⋅⋅⋅KeepMirrors)
 )
+FirstStep ← FirstStepAt 3_0_0
 RepeatToEnd ← (
   0
   ⍢(
@@ -86,11 +95,83 @@ RepeatToEnd ← (
     ≠
   )
 )
+Solve ← (
+  RepeatToEnd
+  ⊙DropAll
+)
+SolveAt ← (
+  FirstStepAt
+  Solve
+  # &p.
+)
 PartOne ← (
   Parse
   FirstStep
-  RepeatToEnd
-  ⊙DropAll
+  Solve
+)
+PartTwo ← (
+  Parse
+  ⊃(△|FixMirrors)
+  [
+    ⊃(
+      # from top
+      ⊢⇡
+      ≡(⊂ 2)
+    | # from bottom
+      ⊢⇌⇡
+      ≡(⊂ 0)
+    | # from left (d)
+      ⍉⊢⍉⇡
+      ≡(⊂ 3)
+    | # from right (g)
+      ⍉⊢⇌⍉⇡
+      ≡(⊂ 1)
+    )  ]
+  ☇ 1
+  ## ╭─
+  ## ╷ 2 0 0
+  ##   2 0 1
+  ##   2 0 2
+  ##   2 0 3
+  ##   2 0 4
+  ##   2 0 5
+  ##   2 0 6
+  ##   2 0 7
+  ##   2 0 8
+  ##   2 0 9
+  ##   0 9 0
+  ##   0 9 1
+  ##   0 9 2
+  ##   0 9 3
+  ##   0 9 4
+  ##   0 9 5
+  ##   0 9 6
+  ##   0 9 7
+  ##   0 9 8
+  ##   0 9 9
+  ##   3 0 0
+  ##   3 1 0
+  ##   3 2 0
+  ##   3 3 0
+  ##   3 4 0
+  ##   3 5 0
+  ##   3 6 0
+  ##   3 7 0
+  ##   3 8 0
+  ##   3 9 0
+  ##   1 0 9
+  ##   1 1 9
+  ##   1 2 9
+  ##   1 3 9
+  ##   1 4 9
+  ##   1 5 9
+  ##   1 6 9
+  ##   1 7 9
+  ##   1 8 9
+  ##   1 9 9
+  ##         ╯
+  ≡SolveAt
+  /↥♭
 )
 ---
 $ \\.
@@ -234,9 +315,19 @@ $ .|....-|.\\
 $ ..//.|....
 Aeq 46 PartOne
 
+$ .|...\\....
+$ |.-.\\.....
+$ .....|-...
+$ ........|.
+$ ..........
+$ .........\\
+$ ..../.\\\\..
+$ .-.-/..|..
+$ .|....-|.\\
+$ ..//.|....
+Aeq 51 PartTwo
+
 &p "Tests OK"
 ---
-&p ⍜now PartOne &fras "day16.txt"
-
-Aeq 7477
-# # Aeq 0 PartTwo &fras "day16.txt"
+# Aeq 7477 PartOne &fras "day16.txt"
+# Aeq 7853 PartTwo &fras "day16.txt"
