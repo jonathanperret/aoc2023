@@ -111,66 +111,25 @@ PartOne ← (
 )
 PartTwo ← (
   Parse
-  ⊃(△|FixMirrors)
+  ⊃(⇡△|FixMirrors)
   [
     ⊃(
       # from top
-      ⊢⇡
+      ⊢
       ≡(⊂ 2)
     | # from bottom
-      ⊢⇌⇡
+      ⊢⇌
       ≡(⊂ 0)
-    | # from left (d)
-      ⍉⊢⍉⇡
+    | # from left
+      ⍉⊢⍉
       ≡(⊂ 3)
-    | # from right (g)
-      ⍉⊢⇌⍉⇡
+    | # from right
+      ⍉⊢⇌⍉
       ≡(⊂ 1)
     )  ]
   ☇ 1
-  ## ╭─
-  ## ╷ 2 0 0
-  ##   2 0 1
-  ##   2 0 2
-  ##   2 0 3
-  ##   2 0 4
-  ##   2 0 5
-  ##   2 0 6
-  ##   2 0 7
-  ##   2 0 8
-  ##   2 0 9
-  ##   0 9 0
-  ##   0 9 1
-  ##   0 9 2
-  ##   0 9 3
-  ##   0 9 4
-  ##   0 9 5
-  ##   0 9 6
-  ##   0 9 7
-  ##   0 9 8
-  ##   0 9 9
-  ##   3 0 0
-  ##   3 1 0
-  ##   3 2 0
-  ##   3 3 0
-  ##   3 4 0
-  ##   3 5 0
-  ##   3 6 0
-  ##   3 7 0
-  ##   3 8 0
-  ##   3 9 0
-  ##   1 0 9
-  ##   1 1 9
-  ##   1 2 9
-  ##   1 3 9
-  ##   1 4 9
-  ##   1 5 9
-  ##   1 6 9
-  ##   1 7 9
-  ##   1 8 9
-  ##   1 9 9
-  ##         ╯
-  ≡SolveAt
+  ≡(spawn SolveAt)
+  wait
   /↥♭
 )
 ---
@@ -330,4 +289,4 @@ Aeq 51 PartTwo
 &p "Tests OK"
 ---
 # Aeq 7477 PartOne &fras "day16.txt"
-# Aeq 7853 PartTwo &fras "day16.txt"
+# Aeq 7853 &p ⍜now PartTwo &fras "day16.txt"

@@ -61,7 +61,7 @@ Si je considère ma matrice de rayons `haut`, en la décalant vers le haut (prob
 * Les cellules `/` auront une copie de la matrice `haut` dans la nouvelle matrice `droite`, et un `0` dans les autres ;
 * Les cellules `-` auront une copie de la matrice `haut` dans les nouvelles matrice `droite` et `gauche`, et un `0` dans les autres.
 
-Si je répète la même opération avec les `4` matrices correspondant aux `4` directions (peut-être avec des `under` bien sentis), j'obtiendrai donc `4` nouvelles matrices par direction, que je pourrais fusionner entre elles avec un `OU` (`maximum` en Uiua), et je serai ainsi prêt pour l'itération suivante. Je pourrai arrêter d'itérer quand une nouvelle matrice sera identique à la précédente.
+Si je répète la même opération avec les `4` matrices correspondant aux `4` directions (peut-être avec des `under` bien sentis), j'obtiendrai donc `4` nouvelles matrices par direction, que je pourrai fusionner entre elles avec un `OU` (`maximum` en Uiua), et je serai ainsi prêt pour l'itération suivante. Je pourrai arrêter d'itérer quand une nouvelle matrice sera identique à la précédente.
 
 Hmm, ça paraît pas mal de travail quand même. Mais l'alternative évidente qui serait de maintenir une liste des rayons en train de traverser la grille promet d'être compliquée aussi : il faudrait quand même se souvenir de l'état des cellules pour éviter de continuer à simuler un rayon qui a déjà été parcouru (je soupçonne qu'il y ait une possibilité de boucle infinie de rayons).
 
@@ -520,4 +520,159 @@ $ ..//.|....
 
 ## Partie 2
 
+Envoyer un rayon vers la droite en haut à gauche, ça illumine `7477` cellules sur les `110*110 = 12100` que compte la grille. Mais apparemment ce n'est pas suffisant.
 
+On me demande d'essayer d'envoyer un rayon depuis toutes les "entrées" de la grille, c'est-à-dire vers le bas et vers le haut dans chaque colonne, et vers la droite et vers la gauche dans chaque ligne.
+
+Je n'ai pas beaucoup de code à ajouter pour faire tourner ma solution à la première partie sur toutes ces possibilités. Je paramétrise bien sûr la fonction `SetupHGBD`, et du coup celles qui l'appellent.
+
+Ensuite plus qu'à traiter les quatre bords de la grille.
+
+Une utilisation rigolote de `range` à noter : quand on lui passe un entier `n`, bien sûr elle génère les entiers de `0` à `n-1` inclus. Mais si on lui passe un tableau comme par exemple `[4 5]`, elle génère un tableau de `4` lignes et `5` colonnes, dont chaque case contient elle-même un tableau contenant ses coordonnées, de `[0 0]` en haut à gauche à `[1 2]` en bas à droite.
+
+```
+⇡ [4 5]
+≡≡□ # je mets les paires en boîte pour que ça soit plus clair
+```
+
+Du coup si je veux énumérer les coordonnées de la ligne du haut de ma grille, je peux utiliser `shape` pour obtenir ses dimensions (`[10 10]`) puis `range` et enfin `first` pour extraire la première ligne de ce tableau de coordonnées. De même pour la dernière ligne, la première colonne et la dernière colonne.
+
+Je lance donc le calcul sur ces `440` possibilités et je vais faire autre chose. Au bout d'un quart d'heure environ, j'ai une réponse. Elle est correcte, mais je ne suis pas très satisfait…
+
+Dans l'espoir d'utiliser un peu plus les capacités de calcul de mon ordinateur j'utilise `spawn` pour tester chaque possibilité sur un thread séparé. Effectivement, ça divise le temps par `4` environ, ça valait le coup.
+
+Avec le recul, j'aurais certainement mieux fait de partir sur une solution qui suive chaque rayon (avec des optimisations pour éviter de refaire le même travail plusieurs fois ou même à l'infini). Mais je suis quand même content d'être allé au bout de mon idée.
+
+```
+Parse ← (
+  ⊜∘≠@\n.
+  = "./\\|-" ¤
+  °[⊙⊙⊙⊙∘]
+)
+DropHGBD ← ;;;;
+KeepHGBD ← ⊙⊙⊙∘
+DropMirrors ← ;;;;;
+KeepMirrors ← ⊙⊙⊙⊙∘
+KeepAll ← ⊙⊙⊙⊙KeepMirrors
+DropAll ← DropHGBD DropMirrors
+FixMirrors ← ⊙∩∩¤ ¤
+
+• ← 1 0 0 0 0
+╱ ← 0 1 0 0 0
+╲ ← 0 0 1 0 0
+│ ← 0 0 0 1 0
+─ ← 0 0 0 0 1
+GoH ← 1 0 0 0
+GoG ← 0 1 0 0
+GoB ← 0 0 1 0
+GoD ← 0 0 0 1
+
+H ← ∘
+G ← ⋅∘
+B ← ⋅⋅∘
+D ← ⋅⋅⋅∘
+
+TopAndFifth ← ⊃(∘|⋅⋅⋅⋅∘)
+
+F ← ↥↥↥ ⊃(↧ TopAndFifth|↧⋅TopAndFifth|↧⋅⋅TopAndFifth|↧↥↥)
+SwizzleH ← ⊃(H|D|G|⋅⋅⋅⋅⊃(⋅⋅⋅(⊙;)|⊙⊙∘))
+SwizzleG ← ⊃(G|B|H|⋅⋅⋅⋅⊃(⋅⋅⋅⋅∘|⊙⊙∘))
+SwizzleB ← ⊃(B|G|D|⋅⋅⋅⋅⊃(⋅⋅⋅(⊙;)|⊙⊙∘))
+SwizzleD ← ⊃(D|H|B|⋅⋅⋅⋅⊃(⋅⋅⋅⋅∘|⊙⊙∘))
+CollectHGBD ← [KeepHGBD]
+Merge ← ⊃(↥TopAndFifth|↥⋅TopAndFifth|↥⋅⋅TopAndFifth|↥⋅⋅⋅TopAndFifth)
+
+Bounce ← ⊃(F SwizzleH|F SwizzleG|F SwizzleB|F SwizzleD)
+
+ShiftH ← ⬚0↻1
+ShiftG ← ⬚0↻0_1
+ShiftB ← ⬚0↻¯1
+ShiftD ← ⬚0↻0_¯1
+ShiftHGBD ← ⊓(ShiftH|ShiftG|ShiftB|ShiftD)
+SetupHGBDAt ← (
+  ⊙(
+    ⊃(...×0|∘)
+    [KeepHGBD]
+  )
+  ⍜⊡ (⋅1)
+  °[KeepHGBD]
+)
+SetupHGBD ← (
+  SetupHGBDAt 3_0_0
+)
+OrHGBD ← ⊃(
+  ↥TopAndFifth
+| ↥⋅TopAndFifth
+| ↥⋅⋅TopAndFifth
+| ↥⋅⋅⋅TopAndFifth
+)
+Step ← (
+  ⊃(Bounce ShiftHGBD|KeepAll)
+  OrHGBD
+)
+Energized ← ↥↥↥
+Count ← /+♭
+FirstStepAt ← (
+  SetupHGBDAt
+  ⊃(Bounce|⋅⋅⋅⋅KeepMirrors)
+)
+FirstStep ← FirstStepAt 3_0_0
+RepeatToEnd ← (
+  0
+  ⍢(
+    ⊓(+1|Step)
+  )(
+    ⊙(Count Energized)
+    ≠
+  )
+)
+Solve ← (
+  RepeatToEnd
+  ⊙DropAll
+)
+SolveAt ← (
+  FirstStepAt
+  Solve
+  # &p.
+)
+PartOne ← (
+  Parse
+  FirstStep
+  Solve
+)
+PartTwo ← (
+  Parse
+  ⊃(⇡△|FixMirrors)
+  [
+    ⊃(
+      # from top
+      ⊢
+      ≡(⊂ 2)
+    | # from bottom
+      ⊢⇌
+      ≡(⊂ 0)
+    | # from left
+      ⍉⊢⍉
+      ≡(⊂ 3)
+    | # from right
+      ⍉⊢⇌⍉
+      ≡(⊂ 1)
+    )  ]
+  ☇ 1
+  ≡(spawn SolveAt)
+  wait
+  /↥♭
+)
+
+$ .|...\\....
+$ |.-.\\.....
+$ .....|-...
+$ ........|.
+$ ..........
+$ .........\\
+$ ..../.\\\\..
+$ .-.-/..|..
+$ .|....-|.\\
+$ ..//.|....
+⍤⊃⋅∘≍ 51 PartTwo
+```
