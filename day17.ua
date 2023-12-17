@@ -55,8 +55,10 @@ ListNeighborsFourD ← (|1
   # opposite direction is forbidden!
   ▽
 )
+# -- maxcount grid -- grid'
 ExpandGridToFourD ← (
-  ↯ ⊂ 4_3 △. # expand grid to 4D by repeating
+  ⊃(∘|⋅△|⋅∘) # expand grid to 4D by repeating
+  ↯ ⊂ ⊂ 4
 )
 # - setup:
 #   - best cost: infinite for all nodes except 0 for start nodes
@@ -200,16 +202,7 @@ DijkstraLoop ← (
       ∘
     | ±◿1000.
       (
-        ⊃(
-          ;   # &p
-            | # 
-          ⋅⊙(
-            ;;;
-            FrameFromBest
-            ⍣(&ims)(⋅;).
-          )
-          ⊂
-        )
+        ⊃(;|⊂⋅⊙(⋅⋅⋅FrameFromBest ⍣(&ims)(⋅;).))
         | ⋅∘ # keep frames as-is
       )
     | ⋅⋅⊙⊙⊙⊙∘
@@ -217,10 +210,9 @@ DijkstraLoop ← (
   )(⋅⋅QueueHasNodes)
   # -- counter frames queuecosts queue visited best graph
   ;
-  ⍣(
-    &p △.
-    &fwa $"day17-_.gif" ⊃(↘1 △|&gife 30)
-  )(⋅;)
+  ; # ⍣(
+  #  &fwa $"day17-_.gif" ⊃(↘1 △|&gife 30)
+  # )(⋅;)
   ⋅⋅⋅⊙;
   # -- best
 )
@@ -229,24 +221,71 @@ GetEndCost ← (
   /↧  # flatten step counts
   ⊢⇌♭ # take last element
 )
-FourDSolve ← (
-  ExpandGridToFourD
+StartNodesFourD ← (
+  # start at top left, either going up or left
+  # (so that the first move is a rotation, which resets the counter)
+  [1_0_0_0 2_0_0_0]
+)
+StartNodesFourDUltra ← (
+  # start at top left, either going up or left
+  # (so that the first move is a rotation, which resets the counter)
+  # for ultra, set counter high so that rotation is possible
+  [1_5_0_0 2_5_0_0]
+)
+FourDSolveOne ← (
+  ExpandGridToFourD 3
   MakeGraph!ListNeighborsFourD
   ⊃(
-    # start at top left, either going right or down
-    [0_0_0_0 3_0_0_0]
-    DijkstraSetup
-  | ∘
+    DijkstraSetup StartNodesFourD
+  | ∘ # keep graph
   )
   DijkstraLoop
   GetEndCost
 )
-PartOne ← FourDSolve Parse
+PartOne ← FourDSolveOne Parse
+ListNeighborsFourDUltra ← (
+  ⊃(<3⊡1|⊢|ListNeighborsFourD)
+  # -- movedenough currentdir neighbors
+  (
+    # ok to turn
+    ;
+  | # not enough steps in this direction yet
+    ⊙(≡⊢.)
+    =
+    ▽
+  )
+)
+GetEndCostUltra ← (
+  /↧  # flatten directions
+  ↘3  # remove nodes with count < 3 (crucible can't stop)
+  /↧  # flatten step counts
+  ⊢⇌♭ # take last element
+)
+FourDSolveUltra ← (
+  ExpandGridToFourD 10
+  MakeGraph!ListNeighborsFourDUltra
+  ⊃(
+    DijkstraSetup StartNodesFourDUltra
+  | ∘ # keep graph
+  )
+  DijkstraLoop
+  GetEndCostUltra
+)
+PartTwo ← FourDSolveUltra Parse
 ---
+# 1_0_4_8
+# ListNeighborsFourDUltra
+# Aeq [1_1_3_8]
+#
+# 1_3_4_8
+# ListNeighborsFourDUltra
+# Aeq [0_0_4_9
+#     1_4_3_8
+#     2_0_4_7]
+#
 $ 12
 $ 25
-Parse
-FourDSolve
+PartOne
 Aeq 7
 
 $ 2413432311323
@@ -262,7 +301,14 @@ $ 4564679986453
 $ 1224686865563
 $ 2546548887735
 $ 4322674655533
-Aeq 102 PartOne
+Aeq 102 PartOne.
+Aeq 94 PartTwo
+$ 111111111111
+$ 999999999991
+$ 999999999991
+$ 999999999991
+$ 999999999991
+Aeq 71 PartTwo
 
 0_0_0_0
 ListNeighborsFourD
@@ -290,7 +336,7 @@ Aeq [[{[0_1 1_0] [2 3]} {[0_0 1_1] [1 4]}]
  6_7_8_9_10
  6_7_8_9_10
  6_7_8_9_10]
-ExpandGridToFourD
+ExpandGridToFourD 3
 MakeGraph!ListNeighborsFourD
 ⊃(
   ⊡ 0_0_0_0
@@ -410,5 +456,5 @@ Aeq [0_12
 
 &p "Tests OK"
 ---
-Aeq 907 PartOne &fras "day17.txt"
-# Aeq 0 PartTwo &fras "day17.txt"
+# Aeq 907 &p ⍜now PartOne &fras "day17.txt"
+# Aeq 1057 PartTwo &fras "day17.txt"

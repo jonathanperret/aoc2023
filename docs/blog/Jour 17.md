@@ -109,7 +109,86 @@ Parse
 
 Puis je me remets à l'implémentation de l'algorithme de Dijkstra.
 
-C'est comme un tunnel interminable.
+Je ne connais pas par cœur les détails de l'algorithme alors j'essaie de rafraîchir ma mémoire avec Wikipedia, mais ce n'est pas une réussite, je trouve le pseudocode confus sur cette page (en français comme en anglais, même si elles sont très différentes).
+
+Je me tourne donc vers RosettaCode qui comporte des implémentations de l'algorithme de Dijkstra dans de nombreux langages (mais pas Uiua, dommage !). J'en regarde quelques-unes puis je m'arrête sur [la version C#](https://rosettacode.org/wiki/Dijkstra%27s_algorithm#C#) qui me paraît relativement concise.
+
+Je retranscris ce code en un pseudocode que j'arrive à comprendre :
+
+```no_run
+# - setup:
+#   - best cost: infinite for all nodes except 0 for start nodes
+#   - visited: all nodes 0
+#   - queue: start nodes (coordinates)
+#   - queuecosts: 0 for each start node
+# - until queue is empty:
+#   - pop cheapest node and cost from queue
+#   - check visited
+#   - if not visited:
+#     - mark node visited
+#     - get neighbors (with weights) of node from graph
+#     - remove visited neighbors
+#     - add node's cost to neighbor's weights
+#     - get neighbors best costs
+#     - keep neighbors where newcost < best cost
+#     - update their best costs with newcost
+#     - add them to the queue
+```
+
+Ensuite j'enrichis ce pseudocode avec l'état de pile que j'imagine qui pourrait correspondre à chaque étape (lignes commençant par `--`) ainsi que les signatures des différentes fonctions qui pourraient implémenter ces étapes (entres parenthèses)  :
+
+```no_run
+# - setup:
+#   - best cost: infinite for all nodes except 0 for start nodes
+#   - visited: all nodes 0
+#   - queue: start nodes (coordinates)
+#   - queuecosts: 0 for each start node
+#   ( startnodes graph -- queuecosts queue visited best )
+# - until queue is empty:
+#     -- queuecosts queue visited best graph
+#   - pop cheapest node and cost from queue
+#     ( queuecosts queue -- node cost queuecosts' queue' )
+#     -- node* cost* queuecosts' queue' visited best graph
+#   - check visited
+#     ( node visited -- isvisited )
+#     -- isvisited* node cost queuecosts queue visited best graph
+#   - if not visited:
+#       -- node cost queuecosts queue visited best graph
+#     - mark node visited
+#       ( node visited -- visited' )
+#       -- node cost queuecosts queue visited' best graph
+#     - get neighbors (with weights) of node from graph
+#       ( node graph -- neighbors neighborweights )
+#       -- neighbors* neighborweights* cost queuecosts queue visited best graph
+#     - remove visited neighbors
+#       ( neighbors neighborweights visited -- neighbors' neighborweights' )
+#       -- neighbors' neighborweights' cost queuecosts queue visited best graph
+#     - add node's cost to neighbor's weights
+#       ( neighborweights cost -- neighborcosts )
+#       -- neighbors neighborcosts* queuecosts queue visited best graph
+#     - get neighbors best costs
+#       ( neighbors best -- neighborbests )
+#       -- neighborbests neighbors neighborcosts queuecosts queue visited best graph
+#     - keep neighbors where newcost < best cost
+#       ( neighborbests* neighbors neighborcosts -- neighbors' neighborcosts' )
+#       -- neighbors' neighborcosts' queuecosts queue visited best graph
+#     - update their best costs with newcost
+#       ( neighbors neighborcosts best -- best' )
+#       -- neighbors neighborcosts queuecosts queue visited best' graph
+#     - add them to the queue
+#       ( neighbors neighborcosts queuecosts queue -- queuecosts' queue' )
+#       -- queuecosts' queue' visited best graph
+```
+
+Ensuite je déroule : pour chaque ligne de pseudocode, j'écris un test pour la fonction qui ferait le travail en question et j'implémente cette fonction.
+
+Au bout d'un long travail j'ai fini par coder toutes ces fonctions.
+
+Il reste à les assembler dans une fonction parente (`DijkstraStep`), dont la responsabilité est essentiellement de manipuler la pile pour que chaque fonction reçoive les bons arguments et que ses valeurs de retour soient bien rangées.
+
+C'est assez laborieux mais en m'y prenant avec méthode, je rencontre assez peu de surprises.
+
+Et quand l'ensemble finit par fonctionner en harmonie, c'est assez satisfaisant.
 
 ```
 Parse ← ⊜(-@0)≠@\n.
@@ -298,22 +377,6 @@ DijkstraLoop ← (
     ⊙DijkstraStep
     # -- counter queuecosts queue visited best graph
     +1
-    ⊃(
-      ±◿10000.
-      (
-        ⊃(
-          &p
-            | ;
-          ;
-          ;
-          /↥/↥
-          ⍣(&ims)(⋅;)
-          # &p /↧/↧
-        )
-        | # do nothing
-      )
-    | ⊙⊙⊙⊙∘
-    )
   )(⋅QueueHasNodes)
   # -- counter queuecosts queue visited best graph
   ⋅⋅⋅⋅⊙;
@@ -352,4 +415,255 @@ $ 1224686865563
 $ 2546548887735
 $ 4322674655533
 ⍤⊃⋅∘≍ 102 PartOne
+```
+
+## Partie 2
+
+Quelques paramètres changent : le chariot peut maintenant faire `10` pas dans une direction avant de devoir tourner, mais il doit aussi faire un minimum de `4` pas avant de pouvoir tourner.
+
+Je dois m'y reprendre à plusieurs fois à cause d'erreurs d'inattention, mais finalement ça fonctionne en ne modifiant quasiment que ma construction de graphe, plus précisément l'établissement des listes de voisins : on ne peut passer à une autre direction que si le compteur atteint le nombre requis. Pour la limite haute de `10` ça se fait naturellement par le fait qu'il n'existe pas de cellules avec une coordonnée de distance supérieure dans mon graphe à 4 dimensions.
+
+```
+Parse ← ⊜(-@0)≠@\n.
+Directions ← [0_1 ¯1_0 0_¯1 1_0]
+# coordinate -- coordinates
+ListNeighbors ← (
+  +Directions ¤
+)
+
+# - graph: node-indexed matrix of boxes[box[nodes] box[weights]]
+#   ( grid -- graph)
+MakeGraph! ← (|1
+  ⊃(
+    △
+    ⊃(
+      ⇡ # generate coordinates
+    | ¤ # fix shape
+    )
+  | ¤ # fix grid
+  )
+  # for each cell coordinate
+  ⍜(☇1)≡(
+    # generate neighbors
+    ^1
+    ⊃(
+      ⊙¤ # fix shape
+      # check if each is < shape and >= 0
+      ≡(/↧ ↧⊃(>|+1±))
+    | ∘ # keep neighbors
+    )
+    ▽     # keep only in-range neighbors
+    {⊃∘⊡} # get edge weights for these from grid, pack together
+  )
+)
+Opposite ← (|1
+  ◿4+2
+)
+ListNeighborsFourD ← (|1
+  ⊃(
+    ⊡0 # get direction
+  | ListNeighbors ↘2
+    ≡(⊂0) # new count defaults to 0
+  | +1⊡1  # get count
+  )
+  ⊃∘(
+    ⊂:0    # target count of original direction
+    ⍜⊡(⋅∘) # replace with new count
+    ≡⊂ ⇡⧻. # add direction number in front
+  )
+  Opposite
+  °⊚
+  ⬚0↯[4]
+  ¬
+  # opposite direction is forbidden!
+  ▽
+)
+# -- maxcount grid -- grid'
+ExpandGridToFourD ← (
+  ⊃(∘|⋅△|⋅∘) # expand grid to 4D by repeating
+  ↯ ⊂ ⊂ 4
+)
+# - setup:
+#   - best cost: infinite for all nodes except 0 for start nodes
+#   - visited: all nodes 0
+#   - queue: start nodes (coordinates)
+#   - queuecosts: 0 for each start node
+#   ( startnodes graph -- queuecosts queue visited best )
+DijkstraSetup ← (|2.4
+  ⊃(
+    ⊃(≡⋅0)∘    # queue costs 0 for start nodes
+  | ⊙(⍜⇌(↘1)△) # shape of node matrix
+    ⊃(
+      ⋅(≠0↯:0) # all nodes unvisited (suggest byte array)
+    | ⊙(↯:∞)   # all nodes infinite cost
+      ⍜⊡(∵⋅0)  # start nodes cost 0
+    )
+  )
+)
+# - pop cheapest node and cost from queue
+#   ( queuecosts queue -- node cost queuecosts' queue' )
+PopCheapest ← (|2.4
+  ⍏.                    # get cost order
+  ⊃(⊢|↘1)               # pop first
+  ⊃(⊡⊙⋅;|⊡⊙;|⊏⋅∘|⊏⋅⊙⋅∘) # pick and select
+)
+# - check visited
+#   ( node visited -- isvisited )
+CheckVisited ← |2 ⊡
+# - mark node visited
+#   ( node visited -- visited' )
+MarkVisited ← |2 ⍜⊡⋅1
+# - get neighbors (with weights) of node from graph
+#   ( node graph -- neighbors neighborweights )
+GetNeighborsWithWeights ← |2.2 ∩°□°⊟ ⊡
+# - remove visited neighbors
+#   ( neighbors neighborweights visited -- neighbors' neighborweights' )
+RemoveVisitedNeighbors ← (|3.2
+  ⊃(
+    ¬⊡ ⊙⋅∘ # get visited status
+  | ⊙∘
+  )
+  ∩▽,: # keep non-visited in both lists
+)
+# - add node's cost to neighbor's weights
+#   ( neighborweights cost -- neighborcosts )
+AddCostToNeighborWeights ← +
+# - get neighbors best costs
+#   ( neighbors best -- neighborbests )
+GetNeighborsBestCosts ← ⊡
+# - keep neighbors where newcost < best cost
+#   ( neighborbests neighbors neighborcosts -- neighbors' neighborcosts' )
+KeepImprovedNeighbors ← (
+  ⊃(
+    < ⊙⋅∘ # mask of improved
+  | ⋅⊙∘   # keep neighbors, neighborcosts
+  )
+  ,: # -- mask neighbors mask neighborcosts
+  ∩▽ # -- neighbors' neighborcosts'
+)
+# - update their best costs with newcost
+#   ( neighbors neighborcosts best -- best' )
+UpdateNeighborsBestCosts ← (|3
+  ⊙:   # bring best up
+  ⍜⊡⋅∘ # replace picked with new costs
+)
+# - add them to the queue
+#   ( neighbors neighborcosts queuecosts queue -- queuecosts' queue' )
+AddNeighborsToQueue ← (|4.2
+  ⊃(⋅⊙∘|⊙⋅⋅∘)
+  ∩(⊂:)
+)
+# - Dijkstra's step:
+#   -- queuecosts queue visited best graph
+DijkstraStep ← (|5.5
+  #   - pop cheapest node and cost from queue
+  #     ( queuecosts queue -- node cost queuecosts' queue' )
+  PopCheapest
+  #     -- node* cost* queuecosts' queue' visited best graph
+  #   - check visited
+  #     ( node visited -- isvisited )
+  ⊃(CheckVisited ⊙⋅⋅⋅∘|⊙⊙⊙⊙∘)
+  #     -- isvisited* node cost queuecosts queue visited best graph
+  #   - assert not visited
+  ⍤"a node in the queue should never be already visited"=0
+  #     -- node cost queuecosts queue visited best graph
+  #   - mark node visited
+  #     ( node visited -- visited' )
+  ⊃(⊙⊙⊙∘|MarkVisited ⊙⋅⋅⋅∘)
+  #     -- node cost queuecosts queue visited' best graph
+  #   - get neighbors (with weights) of node from graph
+  #     ( node graph -- neighbors neighborweights )
+  ⊃(GetNeighborsWithWeights ⊙⋅⋅⋅⋅⋅∘|⋅⊙⊙⊙⊙⊙∘)
+  #     -- neighbors* neighborweights* cost queuecosts queue visited best graph
+  #   - remove visited neighbors
+  #     ( neighbors neighborweights visited -- neighbors' neighborweights' )
+  ⊃(RemoveVisitedNeighbors ⊙⊙⋅⋅⋅∘|⋅⋅⊙⊙⊙∘)
+  #     -- neighbors' neighborweights' cost queuecosts queue visited best graph
+  #   - add node's cost to neighbor's weights
+  #     ( neighborweights cost -- neighborcosts )
+  ⊃(∘|AddCostToNeighborWeights ⋅∘)
+  #     -- neighbors neighborcosts* queuecosts queue visited best graph
+  #   - get neighbors best costs
+  #     ( neighbors best -- neighborbests )
+  ⊃(GetNeighborsBestCosts ⊙⋅⋅⋅⋅∘|⊙⊙⊙⊙⊙∘)
+  #     -- neighborbests neighbors neighborcosts queuecosts queue visited best graph
+  #   - keep neighbors where newcost < best cost
+  #     ( neighborbests* neighbors neighborcosts -- neighbors' neighborcosts' )
+  KeepImprovedNeighbors
+  #     -- neighbors' neighborcosts' queuecosts queue visited best graph
+  #   - update their best costs with newcost
+  #     ( neighbors neighborcosts best -- best' )
+  ⊃(⊙⊙⊙⊙∘|UpdateNeighborsBestCosts ⊙⊙⋅⋅⋅∘|⋅⋅⋅⋅⋅⋅∘)
+  #     -- neighbors neighborcosts queuecosts queue visited best' graph
+  #   - add them to the queue
+  #     ( neighbors neighborcosts queuecosts queue -- queuecosts' queue' )
+  AddNeighborsToQueue
+  #     -- queuecosts' queue' visited best graph
+)
+# ( queuecosts -- nonempty? )
+QueueHasNodes ← ±⧻
+DijkstraLoop ← (
+  # - repeat until queue empty:
+  #   - step
+  0 # counter
+  ⍢(
+    # -- counter queuecosts queue visited best graph
+    ⊙DijkstraStep
+    # -- counter queuecosts queue visited best graph
+    +1
+  )(⋅QueueHasNodes)
+  # -- counter queuecosts queue visited best graph
+  ⋅⋅⋅⋅⊙;
+  # -- best
+)
+StartNodesFourDUltra ← (
+  # start at top left, either going up or left
+  # (so that the first move is a rotation, which resets the counter)
+  # for ultra, set counter high so that rotation is possible
+  [1_5_0_0 2_5_0_0]
+)
+ListNeighborsFourDUltra ← (
+  ⊃(<3⊡1|⊢|ListNeighborsFourD)
+  # -- movedenough currentdir neighbors
+  (
+    # ok to turn
+    ;
+  | # not enough steps in this direction yet
+    ⊙(≡⊢.)
+    =
+    ▽
+  )
+)
+GetEndCostUltra ← (
+  /↧  # flatten directions
+  ↘3  # remove nodes with count < 3 (crucible can't stop)
+  /↧  # flatten step counts
+  ⊢⇌♭ # take last element
+)
+FourDSolveUltra ← (
+  ExpandGridToFourD 10
+  MakeGraph!ListNeighborsFourDUltra
+  ⊃(
+    DijkstraSetup StartNodesFourDUltra
+  | ∘ # keep graph
+  )
+  DijkstraLoop
+  GetEndCostUltra
+)
+PartTwo ← FourDSolveUltra Parse
+
+$ 2413432311323
+$ 3215453535623
+$ 3255245654254
+$ 3446585845452
+$ 4546657867536
+$ 1438598798454
+$ 4457876987766
+$ 3637877979653
+$ 4654967986887
+$ 4564679986453
+$ 1224686865563
+$ 2546548887735
+$ 4322674655533
+⍤⊃⋅∘≍ 94 PartTwo
 ```
