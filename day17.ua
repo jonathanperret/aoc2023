@@ -178,34 +178,50 @@ DijkstraStep ← (|5.5
 # ( queuecosts -- nonempty? )
 QueueHasNodes ← ±⧻
 # (queuecosts queue visited best graph -- best)
+FrameFromBest ← (
+  /↧/↧
+  ⍜♭(
+    =∞.
+    ⍜(▽)(=0)
+    ÷/↥.
+  )
+)
 DijkstraLoop ← (
   # - repeat until queue empty:
   #   - step
-  0
+  ⊃(⋅⋅(¤/↧/↧)|⊙⊙∘) # frames
+  0                # counter
   ⍢(
-    # -- counter queuecosts queue visited best graph
-    ⊙DijkstraStep
-    # -- counter queuecosts queue visited best graph
+    # -- counter frames queuecosts queue visited best graph
+    ⊙⊙DijkstraStep
+    # -- counter frames queuecosts queue visited best graph
     +1
     ⊃(
-      ±◿10000.
+      ∘
+    | ±◿1000.
       (
         ⊃(
-          &p
-            | ;
-          ;
-          ;
-          /↥/↥
-          ⍣(&ims)(⋅;)
-          # &p /↧/↧
+          ;   # &p
+            | # 
+          ⋅⊙(
+            ;;;
+            FrameFromBest
+            ⍣(&ims)(⋅;).
+          )
+          ⊂
         )
-        | # do nothing
+        | ⋅∘ # keep frames as-is
       )
-    | ⊙⊙⊙⊙∘
+    | ⋅⋅⊙⊙⊙⊙∘
     )
-  )(⋅QueueHasNodes)
-  # -- counter queuecosts queue visited best graph
-  ⋅⋅⋅⋅⊙;
+  )(⋅⋅QueueHasNodes)
+  # -- counter frames queuecosts queue visited best graph
+  ;
+  ⍣(
+    &p △.
+    &fwa $"day17-_.gif" ⊃(↘1 △|&gife 30)
+  )(⋅;)
+  ⋅⋅⋅⊙;
   # -- best
 )
 GetEndCost ← (
@@ -394,5 +410,5 @@ Aeq [0_12
 
 &p "Tests OK"
 ---
-# Aeq 907 PartOne &fras "day17.txt"
+Aeq 907 PartOne &fras "day17.txt"
 # Aeq 0 PartTwo &fras "day17.txt"
