@@ -222,6 +222,11 @@ J'écris une série de tests pour vérifier le fonctionnement de cette nouvelle 
 * `b' = (b ∧ (· ∨ │)) ∨ (d ∧ (╲ ∨ │)) ∨ (g ∧ (╱ ∨ │))`
 * `d' = (d ∧ (· ∨ ─)) ∨ (b ∧ (╲ ∨ ─)) ∨ (h ∧ (╱ ∨ ─))`
 
+* `h' = (h ∧ A) ∨ (g ∧ B) ∨ (d ∧ C)`
+* `g' = (g ∧ D) ∨ (h ∧ E) ∨ (b ∧ F)`
+* `b' = (b ∧ A) ∨ (d ∧ B) ∨ (g ∧ C)`
+* `d' = (d ∧ D) ∨ (b ∧ E) ∨ (h ∧ F)`
+
 Je remarque que `─` n'apparaît pas dans l'expression de `h'`. Ça reflète (haha) le fait qu'aucun rayon ne peut repartir vers le haut d'un splitter horizontal.
 
 Je développe :
