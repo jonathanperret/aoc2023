@@ -11,6 +11,42 @@ PartOne ← Area ⊙⊙; Parse
 ParseHex ← ∧(+ ⊙(×16)) ⊙0 ◿39-@0
 Decode ← ≡⊃(-@0⊢⇌|ParseHex↙5)
 PartTwo ← Area ⋅⋅Decode Parse
+Draw ← (
+  ⊙⊙(÷256⍜(☇1|≡ParseHex) ↯ ¯1_3_2)
+  ∩▽, # expand
+  ⊏:Directions
+  - ¤/↧. \+
+  ⊛.
+  ⊝
+  ,:
+  ∩⊏
+  ↯:0⊂:3 +1/↥.
+  :
+  ⊙:
+  ∧(
+    ⊙:
+    ⍜⊡⋅∘
+  )
+
+  # ⍜⊡(⋅∘)
+  &ims
+)
+DrawTwo ← (
+  ⋅;
+  ⊃(
+    Decode
+    ⊃(
+      ⊏:Directions
+      ×
+      /↥-⊃/↧/↥
+      ÷:50
+    | ⊙∘
+    )
+    ⊙(⁅×) :
+  | ∘
+  )
+  Draw
+)
 ---
 ParseHex "12"
 Aeq 18
@@ -50,3 +86,5 @@ Aeq [500254 5411]
 ---
 Aeq 70026 PartOne &fras "day18.txt"
 Aeq 68548301037382 PartTwo &fras "day18.txt"
+# Draw Parse &fras "day18.txt"
+# DrawTwo Parse &fras "day18.txt"
