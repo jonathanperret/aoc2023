@@ -133,7 +133,7 @@ Je ne suis pas fier. Mais au moins je peux lire l'énoncé de la partie 2 et ne 
 
 ## Partie 2
 
-Il s'avère que les directions et les distances utilisées jusqu'à présent ne sont pas les bonnes. Au lieu de ça il faut utiliser ce qu'on avait pris pour une couleur, mais le décoder de la façon suivante : lire les 5 premiers caractères comme un nombre hexédécimal (la distance à parcourir) et le dernier comme la direction (`0` pour la droite, `1` en bas, `2` à gauche et `3` en haut).
+Il s'avère que les directions et les distances utilisées jusqu'à présent ne sont pas les bonnes. Au lieu de ça il faut utiliser ce qu'on avait pris pour une couleur, mais le décoder de la façon suivante : lire les 5 premiers caractères comme un nombre hexadécimal (la distance à parcourir) et le dernier comme la direction (`0` pour la droite, `1` en bas, `2` à gauche et `3` en haut).
 
 Vu les distances que je vais obtenir en convertissant ces nombres hexadécimaux à 5 chiffres, il n'y a effectivement aucune chance que mon approche de remplir une matrice reste viable (à vue de nez ça ferait une matrice de 16 Go, je suis sûr qu'il y en a qui l'ont fait cela dit).
 
@@ -167,13 +167,13 @@ J'essaie de voir de quoi est composée cette fameuse "bordure" qui existe entre 
 
 ![](day18corners.jpg)
 
-Du coup, si je compte combien il y a de chaque type de coins, je devrais pouvoir calculer la surface de cette bordure.
+Du coup, si je compte combien il y a de chaque type de coin, je devrais pouvoir calculer la surface de cette bordure.
 
 Les coins apparaissent à chaque fois que le chemin prend un virage, bien sûr. Après une rapide vérification, dans l'entrée à chaque étape on change de direction, d'ailleurs (sinon il m'aurait suffi de fusionner les mouvements consécutifs dans la même direction).
 
 Pour connaître le type d'un coin (tourne à gauche ou à droite), je commence par énumérer les cas : `RD` tourne à droite, `RU` tourne à gauche, etc. Mais je me rends compte ensuite que je peux plutôt utiliser le signe du produit vectoriel entre les deux directions successives.
 
-Tout ça me mène à une formule dont je suis assez content : `(2*P + B - C) / 4`, où `B` est le nombre de coins qui tournent à droite et `C` le nombre de coins qui tournent à gauche.
+Tout ça me mène à une formule dont je suis assez content : `P/2 + (B - C) / 4`, où `B` est le nombre de coins qui tournent à droite et `C` le nombre de coins qui tournent à gauche.
 
 ![](day18doodles.jpg)
 
@@ -197,9 +197,10 @@ Det ← /- /× ⍜⊢⇌
 Border ← (
   ⊓(
     ⍉ ⊟ ↻1.
-    ≡Det # corner types
+    ≡Det # types de coins
     /+
-  | ×2/+ # perimeter * 2
+    # ici on aura toujours 4 !
+  | ×2/+ # périmètre * 2
   )
   ÷4+
 )
