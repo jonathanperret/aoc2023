@@ -1,36 +1,16 @@
 # Experimental!
 Aeq ← ⍤⊃($"\nexpected\n_\ngot\n_")≍
 
-Parse ← ⊜(°□⊢⊙⋕⊙∩°□°[⊙⊙∘] ⊜□ ¬∊:" #()".) ≠@\n.
+Parse ← ⊜(⊃(⊗:"RDLU"⊢|⋕↘2↘¯10|↘¯1↙¯7)) ≠@\n.
+
 Directions ← [1_0 0_¯1 ¯1_0 0_1]
-DirLetters ← "RDLU"
-LettersToDirections ← ⊏: Directions ⊗:DirLetters
-ToVectors ← × LettersToDirections
-DropOdd ← ▽¬◿2⇡⧻.
-Inside ← /+ ×⊓(⊢⇌|⊢) ∩⍉ ∩DropOdd \+.
-Det ← /- /× ⍜⊢⇌
-Border ← (
-  ⊓(
-    ⍉ ⊟ ↻1.
-    ≡Det # corner types
-    /+
-  | ×2/+ # perimeter * 2
-  )
-  ÷4+
-)
-Area ← + ⊃(Border|Inside ×) LettersToDirections
-PartOne ← (
-  Parse
-  ⊙⊙;
-  Area
-)
+Inside ← /+ ⊢ × ⇌ ∩⍉ \+.
+Border ← +1÷2/+
+Area ← + ⊃(⋅Border|Inside × ⊏:Directions)
+PartOne ← Area ⊙⊙; Parse
 ParseHex ← ∧(+ ⊙(×16)) ⊙0 ◿39-@0
-Decode ← ≡⊃(⊡:DirLetters-@0⊢⇌|ParseHex↙5)
-PartTwo ← (
-  Parse
-  ⋅⋅Decode
-  Area
-)
+Decode ← ≡⊃(-@0⊢⇌|ParseHex↙5)
+PartTwo ← Area ⋅⋅Decode Parse
 ---
 ParseHex "12"
 Aeq 18
@@ -57,13 +37,13 @@ Inside
 Aeq 15
 
 2_2_2_2
-$ RDLU
+0_1_2_3
 Aeq 9 Area
 
 ["7a21e3"
  "015232"]
 Decode
-Aeq "UL"
+Aeq 3_2
 Aeq [500254 5411]
 
 &p "Tests OK"
