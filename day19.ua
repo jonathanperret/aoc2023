@@ -83,6 +83,115 @@ MakeDot ← (
   )≠@\n.
   $"digraph {rankdir=LR;ranksep=10;splines=false;\n_}\n"
 )
+# ( rule block instateblocks -- outblock instateblocks )
+ApplyRuleToBlock ← (|3.2
+  # -- rule block instateblocks
+  °[⊙⊙⊙∘] # unpack rule
+  # -- attrindex min max next block instateblocks
+  ⊃(
+    ⊙⋅⋅⋅∘ # -- attrindex block
+  | ⋅⊙⊙∘
+  )
+  # -- attrindex block min max next inblockstates
+  ⊃(
+    ⊙∘  # keep attrindex and block
+  | °□⊡ # pick attribute range
+    # -- range min max
+    # compare range
+    ↧⊃(<|>⊙;|∘)
+    # split range
+    ∩□⊃▽(▽¬)
+    # -- inrange outrange
+  )
+  # -- attrindex block inrange outrange next instateblocks
+  ⊃(⊙⊙∘|⊙⊙⋅∘)
+  # -- attrindex block inrange attrindex block outrange next instateblocks
+  ∩(⍜⊡⋅∘)
+  # -- inblock outblock next instateblocks
+  ⊃(
+    ⋅∘     # keep outblock
+  |        # append to instateblocks
+    {:⊙⋅∘} # couple outblock and nextstate
+    ⊂¤
+  )
+  # -- outblock instateblocks'
+)
+# ( maximum -- block )
+InitialBlock ← (
+  +1⇡ # 1 to max
+  ▽ 4 □
+)
+# ( stateblock workflows -- newstateblocks )
+Expand ← (|2
+  # -- stateblock workflows
+  ∩°□°⊟
+  # -- state block workflows
+  ⊃(°□⊡⊙⋅∘|⋅∘) # get workflow from state
+  # -- workflow block
+  ⊙⊙(
+    [] # newstateblocks
+  )
+  # -- workflow block newstateblocks
+  ∧(|3.2
+    ApplyRuleToBlock
+  )
+  # -- finalblock newstateblocks
+  ⍤"final block should have empty range"≍□[]⊢
+  # -- newstateblocks
+)
+# ( stateblocks -- accepted stateblocks' )
+CountAndFilter ← (|1.2
+  # -- newstateblocks
+  ≡°□⊢⍉. # get states
+  ⊃(
+    =¯2
+    ▽
+    ;°⊟⍉
+    ≡(
+      °□
+      ≡⧻
+      /×
+    )
+    /+
+  | ▽≥0
+  ) # count accepted, remove rejected
+  # -- newaccepted newstateblocks
+)
+Step ← (
+  ⊃(
+    ↘1 # remaining stateblocks
+  | ⊢  # pop first stateblock
+    # -- stateblock totalaccepted workflows
+    ⊃(
+      ⋅∘ # keep totalaccepted
+    | ⊙; # drop totalaccepted
+      Expand
+      # -- newstateblocks
+      CountAndFilter
+      # -- newaccepted newstateblocks
+    | ⋅⋅∘ # keep workflows
+    )
+    # -- totalaccepted newaccepted newstateblocks workflows
+    :+
+    # -- stateblocks accepted workflows
+  )
+  ⊂: # insert new stateblocks in stack
+)
+# ( maximum workflows -- totalaccepted )
+Loop ← (
+  # -- workflows
+  [{0 InitialBlock ∘}] # init stack of stateblocks
+  # -- stateblocks workflows
+  ⊙0
+  # -- stateblocks totalaccepted workflows
+  ⍢(Step|±⧻) # until stateblocks empty
+  ⋅⊙;        # keep only totalaccepted
+  # -- totalaccepted
+)
+PartTwo ← (
+  ;Parse
+  Loop 4000
+)
 ---
 [787 2655 1222 2876]
 [[3 ¯∞ 1351 1]
@@ -114,10 +223,19 @@ Parse.
  [0 ¯∞ ∞ 8]]
 Aeq
 
-⍤⊃⋅∘≍ 19114 PartOne
+⍤⊃⋅∘≍ 19114 PartOne.
+⍤⊃⋅∘≍ 167409079868000 PartTwo
+
+$ in{s<3:A,bbb}
+$ bbb{x>5:R,A}
+$
+$
+;Parse
+Loop 10
+Aeq 6000
 
 &p "Tests OK"
 ---
 Aeq 421983 PartOne &fras "day19.txt"
 # &fwa "day19.dot" MakeDot &fras "day19.txt"
-# Aeq 0 PartTwo &fras "day19.txt"
+Aeq 129249871135292 PartTwo &fras "day19.txt"
