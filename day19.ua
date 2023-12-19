@@ -72,6 +72,17 @@ PartOne ← (
   ▽:
   /+♭
 )
+MakeDot ← (
+  °□⊢⊜□¬⌕"\n\n".
+  /⊐⊂⊜(
+    ⊗ @{.
+    □$"_\n" ⊂⊃(
+      $"\"_\" -> "↙
+    | ↘¯1/⊐⊂⊜(□$"\"_\","⇌↙ ⊗ @:.)≠@,.⇌↘¯1↘+1
+    )
+  )≠@\n.
+  $"digraph {rankdir=LR;ranksep=10;splines=false;\n_}\n"
+)
 ---
 [787 2655 1222 2876]
 [[3 ¯∞ 1351 1]
@@ -108,4 +119,5 @@ Aeq
 &p "Tests OK"
 ---
 Aeq 421983 PartOne &fras "day19.txt"
+# &fwa "day19.dot" MakeDot &fras "day19.txt"
 # Aeq 0 PartTwo &fras "day19.txt"
