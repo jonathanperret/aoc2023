@@ -4,9 +4,62 @@ Aeq ← ⍤⊃($"\nexpected\n_\ngot\n_")≍
 Parse ← ⊜(⊃(⊗:"RDLU"⊢|⋕↘2↘¯10|↘¯1↙¯7)) ≠@\n.
 
 Directions ← [1_0 0_¯1 ¯1_0 0_1]
-Inside ← /+ ⊢ × ⇌ ∩⍉ \+.
+
+# ( dirs lengths -- points )
+CenterPolygon ← \+ ×
+
+# ( points -- area )
+PolygonArea ← (
+  ↻1.
+  # -- x2y2s x1y1s
+  ∩⍉
+  ⊃(∩⊢|∩(⊢⇌))
+  # -- x1 x2 y1 y2
+  ⊓-+
+  # -- x2-x1 y2+y1
+  ×
+  ⌵/+
+  ÷2
+)
+
+# ( v1 v2 -- cross )
+Cross ← (
+  # -- [x1 y1] [x2 y2]
+  ⇌
+  # -- [y1 x1] [x2 y2]
+  ×
+  # -- [x2y1 x1y2]
+  /-
+  # -- x1y2 - x2y1
+)
+⍤⊃⋅∘≍ 1 Cross [1 0] [0 1]
+
+# ( dirs lengths -- points )
+OutsidePolygon ← (
+  ⊃(
+    CenterPolygon
+  | # 
+    # -- dirs
+    ↻1.
+    # -- d1s d2s
+    ⊃(
+      -
+      # -- d1s - d2s
+    | ≡Cross
+      # -- d1∧d2s
+    )
+    ×
+    ÷2
+    # -- corner offsets
+  )
+  +
+)
+
+Area ← PolygonArea OutsidePolygon ⊏:Directions
+
 Border ← +1÷2/+
-Area ← + ⊃(⋅Border|Inside × ⊏:Directions)
+Area ← + ⊃(⋅Border|PolygonArea CenterPolygon ⊏:Directions)
+
 PartOne ← Area ⊙⊙; Parse
 ParseHex ← ∧(+ ⊙(×16)) ⊙0 ◿39-@0
 Decode ← ≡⊃(-@0⊢⇌|ParseHex↙5)
@@ -48,6 +101,16 @@ DrawTwo ← (
   Draw
 )
 ---
+2_4_2_4
+0_1_2_3
+Aeq 15 Area
+
+["7a21e3"
+ "015232"]
+Decode
+Aeq 3_2
+Aeq [500254 5411]
+
 ParseHex "12"
 Aeq 18
 $ R 6 (#70c710)
@@ -67,20 +130,6 @@ $ U 2 (#7a21e3)
 
 ⍤⊃⋅∘≍ 62 PartOne .
 ⍤⊃⋅∘≍ 952408144115 PartTwo
-
-[5_0 0_¯3 ¯5_0 0_3]
-Inside
-Aeq 15
-
-2_2_2_2
-0_1_2_3
-Aeq 9 Area
-
-["7a21e3"
- "015232"]
-Decode
-Aeq 3_2
-Aeq [500254 5411]
 
 &p "Tests OK"
 ---
