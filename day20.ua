@@ -110,6 +110,11 @@ InitStates ← (|1
   )
 )
 
+# ( -- pulsequeue )
+NewPulseQueue ← ↯ 0_3 0 # -- [targetnode fromnode level]
+# ( -- history )
+NewHistory ← ↯0_3 0
+
 # ( types names nameoutputlists -- nodes<type outputs inputs name> )
 Prepare ← (
   ⊓(⊂ B|⊂ □"button"|⊂ □{"broadcaster"})
@@ -119,11 +124,6 @@ Prepare ← (
   ≡{⊓(Type ∘|Outputs °□|Inputs °□|°□)}
   InitStates.
 )
-
-# ( -- pulsequeue )
-NewPulseQueue ← ↯ 0_3 0 # -- [targetnode fromnode level]
-# ( -- history )
-NewHistory ← ↯0_3 0
 
 # ( id nodes -- name )
 LookupName ← (
@@ -259,7 +259,6 @@ PartOne ← (
   ⊂: "\nrx ->\n"
   Parse
   Prepare
-  # -- states nodes
   NewPulseQueue
   NewHistory
   # -- history pulsequeue states nodes
@@ -269,6 +268,74 @@ PartOne ← (
   )1000
   ⊙(;;;)
   ScoreHistory
+)
+PartTwo ← (
+  ⊂: "\nrx ->\n"
+  Parse
+  Prepare
+  NewPulseQueue
+  NewHistory
+  # -- history pulsequeue states nodes
+  ⊃(
+    ⊙⊙⊙∘
+  | ⋅⋅⋅∘
+    # -- nodes
+    # find parent of `rx` (central nand)
+    # `rx` is always at index 2 because it's the third broadcaster
+    ⊢⊡2_2.
+    # -- central nodes
+    # find parents of central
+    °□⊡2⊡
+    # ok, these are the nodes we want to find the first "high" from
+    ⊙[] # hold trackedfound
+    1   # count presses
+    # -- counter tracked trackedfound
+  )
+  # -- history pulsequeue states nodes counter tracked trackedfound
+  # now run
+  ⍢(
+    ⊙PushButton
+    ⍢(Step|±⋅⧻)
+    # -- history pulsequeue states nodes counter tracked trackedfound
+    ⊃(
+      # new empty history
+      NewHistory
+    | ⋅⊙⊙⊙(+1) # keep queue, states and nodes, bump counter
+    |          # 
+      # search for tracked nodes in history
+      ⊙⋅⋅⋅⊙⊙∘
+      # -- history counter tracked trackedfound
+      # which nodes emitted high this time?
+      ▽°⊟⊏ 2_1 ⍉
+      # -- highemitters counter tracked trackedfound
+      ⊃(
+        ∊: ⊙⋅∘
+        | ⋅⊙⊙∘
+      ) # search for tracked in highemitters
+      # -- foundnow counter tracked trackedfound
+      ⊃(
+        ⊙⋅∘
+        # -- foundnow tracked
+        ¬
+        # -- notfoundnow  tracked
+        ▽ # remove found from tracked
+        # -- tracked'
+        | ⊙⊙⋅∘
+        # -- foundnow counter trackedfound
+        /+
+        # -- countfound counter trackedfound
+        ▽  # as many copies of counter as were found
+        ⊂: # append counter copies to trackedfound
+      )
+      # -- tracked' trackedfound'
+    )
+  | # -- history pulsequeue states nodes counter tracked trackedfound
+    # repeat while tracked is not empty
+    ⋅⋅⋅⋅⋅(±⧻)
+  )
+  # -- history pulsequeue states nodes counter tracked trackedfound
+  ⋅⋅⋅⋅⋅⋅∘ # -- trackedfound
+  /×      # the result is the product
 )
 ---
 $ broadcaster -> a
@@ -347,4 +414,4 @@ Aeq {[High High Low] [[To 1 High] [To 2 High]]} {⊙∘}
 ---
 # Dot Parse &fras "day20.txt"
 ⍤⊃⋅∘≍ 839775244 PartOne &fras "day20.txt"
-# Aeq 0 PartTwo &fras "day20.txt"
+⍤⊃⋅∘≍ 207787533680413 &p⍜now PartTwo &fras "day20.txt"
