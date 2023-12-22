@@ -188,3 +188,189 @@ $ 1,1,8~1,1,9
 
 ⍤⊃⋅∘≍ 5 PartOne
 ```
+
+## Partie 2
+
+Ah ben faudrait savoir. Maintenant il paraît qu'on cherche la brique qui en fera tomber le plus d'autres si on la désintègre. Enfin, l'énoncé commence par dire ça mais la question finale c'est plutôt : pour chaque brique, calculer le nombre de briques qui tombent si on l'enlève, et faire la somme de tous ces nombres.
+
+En théorie c'est assez simple : je peux enlever chaque brique successivement, faire une simulation et regarder ce qui tombe. Et avec seulement `1229` briques, ça ne prendrait certainement pas plus de quelques minutes.
+
+Mais faisons plutôt les choses proprement. Dans la première partie, j'ai calculé l'ensemble des briques qui soutiennent une brique donnée. Bien sûr, en inversant cette relation je peux obtenir l'ensemble des briques soutenues par une brique donnée. Ensuite, ça devrait être assez rapide de parcourir cette relation pour trouver la cascade de briques déclenchée par la désintégration d'une brique.
+
+D'ailleurs, si je construis cette relation — sous la forme assez naturelle en Uiua d'une matrice binaire — je pourrai m'en servir pour ré-exprimer le calcul de la partie 1.
+
+Je commence donc par faire ça, en extrayant de ma fonction `FindKeepers` précédente une fonction `SupportMatrix` :
+
+```
+Parse ← ↯ ¯1_2_3 ⊜⋕∊:"0123456789".
+# ( range1 range2 -- bool )
+RangesIntersect ← ≤⊓(⊡1|⊡0)⍜⊟(⊏⍏.)
+# ( brick1 brick2 -- bool )
+Covers ← ↧∩RangesIntersect ⊃(∩≡(⊡0)|∩≡(⊡1))
+# ( bricks -- matrix )
+SupportMatrix ← (|1
+  :¤. # fix a copy
+  # -- bricks [bricks]
+  ≡(|2
+    # -- brick bricks
+    ⊃(
+      ⊡0_2      # get zmin
+      -1        # find zmax of supporters
+      ⊙(⊡1_2 ⍉) # pick zmax from bricks
+      =         # match zmin-1 against zmax of bricks
+    | ¤         # fix brick
+      ≡Covers   # find covered bricks mask
+    )
+    # -- justundermask coveredmask bricks
+    # and masks together
+    ↧
+  )
+)
+
+[[1_0_1 1_2_1]
+ [0_0_2 2_0_2]
+ [0_2_2 2_2_2]
+ [0_0_3 0_2_3]
+ [2_0_3 2_2_3]
+ [0_1_4 2_1_4]
+ [1_1_5 1_1_6]]
+SupportMatrix
+```
+
+J'ai maintenant une matrice qui contient sur chaque ligne un `1` pour chaque autre brique qui soutient celle-ci. Dans l'exemple on trouve donc uniquement des `0` sur la première ligne, puisque la première brique repose directement sur le sol.
+
+Je peux facilement réexprimer la première partie (`FindKeepers`) en cherchant les lignes ne contenant qu'un seul `1`, puis en récupérant la position des `1` en question pour connaître le numéro des briques porteuses.
+
+```no_run
+# ( bricks -- keepersmask )
+FindKeepers ← (
+  SupportMatrix
+  # find bricks supported by a single other
+  =1/+⍉.
+  # find the supporters for those
+  /↥▽
+)
+```
+
+Ensuite, pour trouver l'ensemble des briques soutenues même indirectement par une brique donnée, je vais faire :
+* initialiser la liste des briques qui tombent avec la brique de départ ;
+* initialiser un "compteur de supports", un vecteur qui donne pour chaque brique le nombre de supports qu'elle a ;
+* trouver les briques supportées par une des briques qui tombent, et décrémenter leur compteur de support ; celles qui passent à `0` supports deviennent la nouvelle liste des briques qui tombent, et on note que celles-ci sont tombées ;
+* répéter l'étape précédente jusqu'à ce que la liste des briques qui tombent soit vide.
+
+Grâce à la représentation en matrice des relations de support entre les briques, ces opérations sont plutôt rapides. Donc ça ne prend vraiment pas longtemps de faire la boucle sur chacune des briques.
+
+```
+Parse ← ↯ ¯1_2_3 ⊜⋕∊:"0123456789".
+# ( range1 range2 -- bool )
+RangesIntersect ← ≤⊓(⊡1|⊡0)⍜⊟(⊏⍏.)
+# ( brick1 brick2 -- bool )
+Covers ← ↧∩RangesIntersect ⊃(∩≡(⊡0)|∩≡(⊡1))
+# ( bricks -- bricks' )
+DropAll ← (
+  ⊏⍏≡(⊡0_2).
+  ⊙[[[¯∞ ¯∞ ¯∞] [∞ ∞ 0]]]
+  ∧(
+    ⊂: ⊃(
+      ⊃∘(/↥ ≡(⊡ 1_2) ▽ ⊃(≡Covers|⋅∘) ¤)
+      ⊃∘(-1-: ⊡0_2)
+      ⍜(⊡[0_2 1_2])(-:)
+    | ⋅∘
+    )
+  )
+  ↘1
+)
+# ( bricks -- matrix )
+SupportMatrix ← (|1
+  :¤. # fix a copy
+  # -- bricks [bricks]
+  ≡(|2
+    # -- brick bricks
+    ⊃(
+      |2   # -- brick bricks
+      ⊡0_2 # get zmin
+      -1   #  find zmax of supporters
+      # -- zmin-1 bricks
+      ⊙(⊡1_2 ⍉) # pick zmax from bricks
+      =         # match zmin-1 against zmax of bricks
+    | |2        # -- brick bricks
+      ¤         # fix brick
+      ≡Covers   # find covered bricks mask
+      # -- coveredmask
+    )
+
+    # -- justundermask coveredmask bricks
+    # and masks together
+    ↧
+  )
+)
+
+# ( bricks -- keepersmask )
+FindKeepers ← (
+  SupportMatrix
+  # find bricks supported by a single other
+  =1/+⍉.
+  # find the supporters for those
+  /↥▽
+)
+CountRemovable ← (
+  ⊃(/+ FindKeepers|⧻)
+  -
+)
+PartOne ← (
+  Parse
+  DropAll
+  CountRemovable
+)
+Step ← (
+  # get their supportees
+  ⊃(/+▽⊙⋅∘|⋅⊙∘)
+  # bump down supportercount of supportees
+  -
+  # find new list of falling bricks
+  =0.
+  # bump supportcount of fallers to -inf to avoid them falling again
+  ⊃(∘|⍜▽(-∞))
+)
+PartTwo ← (
+  Parse
+  DropAll
+  SupportMatrix
+  # compute supporters count
+  ≡/+.
+  # those on the ground (no supporters) have infinite supporters
+  .
+  =0
+  ⍜▽(+∞)
+  # pre-transpose suppportmatrix: becomes list of supportees lists
+  ⊙⍉
+  ⊠=.⇡⊃(⋅⧻|⊙∘) # range of bricks to remove
+  ⊙∩¤          # fix counts and matrix
+  ≡(
+    # pick a selection to remove
+    # ( fallingmask supportercounts supporteesmatrix -- fallingmask' )
+    ⍢(
+      Step
+    | # until fallingmask is all zeroes
+      ±/+.
+    )
+    # count fallers
+    ⋅(⧻⊚<0)
+    # drop matrix
+    ⊙;
+  )
+  /+
+)
+
+$ 1,0,1~1,2,1
+$ 0,0,2~2,0,2
+$ 0,2,3~2,2,3
+$ 0,0,4~0,2,4
+$ 2,0,5~2,2,5
+$ 0,1,6~2,1,6
+$ 1,1,8~1,1,9
+
+⍤⊃⋅∘≍ 5 PartOne.
+⍤⊃⋅∘≍ 7 PartTwo
+```
+
