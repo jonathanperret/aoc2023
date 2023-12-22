@@ -68,3 +68,123 @@ Voilà, je crois que je sais faire tomber des briques. En `n^2` certes, mais ne 
 Maintenant, une brique participe vraiment à en soutenir une autre si elle est dessous mais avec un `zmax` immédiatement inférieur au `zmin` de la première. Pour chaque brique, je peux énumérer les briques qui sont "au-dessus", et regarder si une d'entre celle-là a un `zmin` égal à mon `zmax` plus 1. Probablement plus efficace dans l'autre sens : je filtre les briques pour ne garder que celles qui ont le `zmin` requis, puis je regarde s'il y en a qui me couvrent.
 
 …et non, c'est toujours pas ça. Ce n'est pas parce qu'une brique est posée sur moi qu'elle va tomber si je me retire, il faut que je me mette ça dans le crâne.
+
+Je finis par arriver à quelque chose qui marche : pour chaque brique, je regarde quelles sont les briques qui la soutiennent (intersectant en X/Y et dont le `zmax` est égal à mon `zmin-1`), et s'il n'y en a qu'une, j'ajoute cette dernière à la liste des briques "porteuses".
+
+Ça me donne enfin la bonne réponse à la partie 1.
+
+```
+Parse ← ↯ ¯1_2_3 ⊜⋕∊:"0123456789".
+
+# ( range1 range2 -- bool )
+RangesIntersect ← (
+  # sort by min1
+  ⍜⊟(⊏⍏.)
+  # get max1, min2
+  ⊓(⊡1|⊡0)
+  # check it's at least min2
+  ≤
+)
+# ( brick1 brick2 -- bool )
+Covers ← (|2
+  ⊃(
+    ∩≡(⊡0)
+  | ∩≡(⊡1)
+  )
+  ∩RangesIntersect
+  ↧
+)
+DropAll ← (
+  ⊏⍏≡(⊡0_2).              # sort bricks by increasing z
+  ⊙[[[¯∞ ¯∞ ¯∞] [∞ ∞ 0]]] # dropped bricks accumulator: start with ground
+  # for each brick to drop
+  ∧(
+    # -- dropping dropped
+    ⊃(
+      ⊃∘(
+        ¤ # fix dropping
+        # -- [dropping] dropped
+        ⊃(
+          ≡Covers # find potentially supporting dropped bricks
+          # -- [covers?]
+            | ⋅∘
+        )
+        # -- [covers?] dropped
+        ▽
+        # -- covered
+        # find max zmax
+        ≡(⊡ 1_2)
+        /↥
+      )
+      # -- dropping droppedzmax
+      ⊃∘(
+        # distance to fall = myzmin - droppedzmax - 1
+        ⊡0_2
+        -1-:
+      )
+      # -- dropping falldist
+      ⍜(⊡[0_2 1_2])(
+        -:
+      )
+      # -- dropping
+    | ⋅∘ # keep dropped
+    )
+    # -- dropping dropped
+    # add dropping to dropped
+    ⊂:
+  )
+  ↘1 # remove ground
+)
+FindKeepers ← (
+  ⊏⍏≡(⊡0_2). # sort bricks by increasing z
+  :¤.        # fix a copy
+  ≡(
+    # -- brick bricks
+    ⊃∘(
+      ⊡0_2 # get zmin
+      -1   #  find zmax of supporters
+      # -- zmin-1 bricks
+      ⊙(≡(⊡1_2).) # pick zmax from bricks
+      =           # match zin-1 against zmax of bricks
+      # keep only matching
+      ▽
+    )
+    # -- brick justunder
+    ¤             # fix brick
+    ⊃(≡Covers|⋅∘) # find covered bricks
+    ▽♭
+    # -- supporters
+    =1⧻. # only one supporter?
+    # if so, keep it
+    (
+      ⋅[]
+    | ∘
+    )
+    □
+  )
+  ≠□[].
+  ≡°□▽
+  ☇2
+  ⊝
+  # -- tokeep
+)
+CountRemovable ← (
+  ⊃(⧻FindKeepers) ⧻
+  -
+)
+PartOne ← (
+  Parse
+  DropAll
+  CountRemovable
+)
+
+$ 1,0,1~1,2,1
+$ 0,0,2~2,0,2
+$ 0,2,3~2,2,3
+$ 0,0,4~0,2,4
+$ 2,0,5~2,2,5
+$ 0,1,6~2,1,6
+$ 1,1,8~1,1,9
+
+⍤⊃⋅∘≍ 5 PartOne
+```
