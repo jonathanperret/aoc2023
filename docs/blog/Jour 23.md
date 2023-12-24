@@ -202,3 +202,212 @@ $ #.....###...###...#...#
 $ #####################.#
 ⍤⊃⋅∘≍ 94 PartOne
 ```
+
+## Partie 2
+
+Comme d'habitude, ça se complique un peu… même question, mais cette fois les contraintes indiquées par `>` et `v` n'existent plus !
+
+Il me faut beaucoup trop de temps pour arriver à modifier mon parcours de carte de la première partie (qui n'était déjà pas brillant) afin d'extraire les distances entre les différents "carrefours". Je finis par y arriver et ça donne un graphe (représenté dans mon programme par une matrice d'adjacence) qui ressemble à ça :
+
+![](day23.svg)
+
+Ensuite il me faut encore beaucoup de temps pour écrire une énumération de tous les chemins possibles qui traversent ce graphe. Heureusement, pas tellement de déboguage une fois que ça tourne. La réponse me parvient en quelques minutes et je suis bien content de pouvoir mettre ce problème derrière moi.
+
+```
+Parse ← ⊜∘≠@\n.
+Directions ← [0_1 ¯1_0 0_¯1 1_0]
+AllowedDirs ← (
+  ⊗: ".>v"
+  (
+    Directions
+  | [0_1 1e3_1e3 1e3_1e3 1e3_1e3]
+  | [1e3_1e3 1e3_1e3 1e3_1e3 1_0]
+  | [1e3_1e3 1e3_1e3 1e3_1e3 1e3_1e3] # you're stuck, man
+  )
+)
+WalkFromStep ← (
+  # -- continue path grid next
+  ⍤"flag should be 1" # drop continue flag
+  ⊃(
+    ⊢⇌ # get last step
+    ⊃(
+      ⊃(⊡|⊙∘) # look it up in grid
+      AllowedDirs
+      +⊙¤              # get neighbor coordinates
+      ⊃(⬚@#⊡|∘)        # look neighbors up in grid
+      ▽↥⊃(=@.|=">..v") # keep only walkable
+    | ⍜⊡(⋅@#)          # patch grid to avoid backtracking
+    )
+  )∘ # keep path
+  # -- neighbors grid path next
+  =1⧻. # switch on count of walkable neighbors
+  (
+    # -- neighbors grid path next
+    ⊃(
+      ⊃(⋅⋅⋅⋅0|⋅⋅∘|⋅∘) # -- continue path grid
+    | ∘               # next = neighbors
+    )
+  | # 1 neighbor
+    # -- neighbors grid path next
+    ⊃(∘|⋅⋅∘|⋅∘|⋅⋅⋅∘) # -- neighbors path grid next
+    ⊂:               # add it to path
+    1                # continue
+  )
+)
+# ( start grid -- path next grid' )
+WalkFrom ← (
+  ¤    # init path with start
+  ⊙⊙[] # next to explore
+  1    # continue flag
+  ⍢WalkFromStep∘
+  ⍤"continue should be 0"=0
+  ⊙:
+)
+
+# ( grid -- grid' )
+AddBorder ← (
+  ⬚∘(↻¯1_¯1↙+2_2△.) @#
+)
+FindNodes ← (
+  ⊃(◫3_3|△) # assumes padded grid
+  ≡≡(
+    ≠@#
+    ↧ ⊃(
+      ⊡1_1
+    | ≠2 /+ ⊡+1Directions
+    )
+  )
+  ⬚0(↻¯1_¯1↙): # restore border lost by ◫
+)
+# ( start first grid -- path next grid' )
+WalkFromInto ← (
+  ⊃(
+    ⋅∘
+  | ⊙⋅∘
+    ⍜⊡(⋅@#) # patch grid to avoid backtracking
+  )
+  WalkFrom
+)
+
+# ( start grid -- lenghts+ends )
+PathsFrom ← (
+  +Directions¤.
+  :
+  ¤
+  ⊙⊙¤
+  ≡(
+    ⊓({⊃(⧻|⊢⇌)}|⋅;)WalkFromInto
+  )
+  ▽>1≡°□⊢⍉. # keep only valid paths
+  ⊝
+)
+MakePathMatrix ← (
+  AddBorder
+  ⊚FindNodes.
+  &p$"nodes: _"/$"_ _".
+  # ⊃⊙∘(≡&p⬚0+×2°⊚)
+  ⊙(¤)                          # fix grid
+  ≡(□≡({⊙⊙∘}⊙°{⊙∘})⊃¤PathsFrom) # build paths
+  /⊐⊂                           # flatten results
+  ∩∵°□⊟°[⊙:]⍉                   # split into starts/ends + lengths
+  ⍉⍜(☇1)⊛                       # number nodes
+  ↯:0⊟.⊃(+1/↥♭|⊙∘)              # get node count, make empty matrix
+  ⍜(⊡)(⋅∘):                     # fill matrix with lengths
+  ⍤"adjacency matrix should be symmetric"≍⍉..
+)
+RemoveSlopes ← (
+  ⍜♭(⍜▽(∵⋅@.) ∊:">v".)
+)
+
+StartFrom ← (
+  [{⊃(≠:⇡⧻:|⊡|0)}] # initial queue contents
+)
+
+UnsetVariants ← (
+  ×⊙¤¬⬚0↙⊟:⊃(⧻|⧻.⬚0≡°⊚⊚)
+)
+
+# ( {available next lengthsofar} bestlength matrix -- entries )
+ProcessQueueEntry ← (
+  °{⊙⊙∘}
+  # -- available next lengthsofar bestlength matrix
+  ⊃∘(
+    ×        # filter neighbors by availability
+    ×⊃(+|>0) # add lengthsofar to available
+  )
+  # -- available nextlengths bestlength matrix
+  ⊃(
+    >0,                            # which neighbors are actually visitable?
+    ⊃(UnsetVariants|▽ ⊙⋅⋅⋅∘|▽ ⊙⋅∘) # make queue entries (available' + next + length)
+    ≡{⊙⊙∘}                         # pack new queue entries
+  | ⊃(
+      # compare bestlength to length for final node
+      ⋅(⊢⇌)
+    | ⋅⋅∘
+    | ∘
+    )
+    >0.
+    (
+      # final node not reached: nothing to do
+      ⋅∘
+    | <,,
+      (
+        # ⊃(&p$"same old:_ <= _\t_"⊙⊙¬)
+        ⋅∘
+        | ⊃(&p$"new best: _ > _\t_"⊙⊙¬)⊙;
+      )
+    )
+  )
+)
+# ( queue bestlength matrix -- queue' bestlength' )
+FindLongestPathStep ← (|3.2
+  ⊃(
+    ↘1 # rest of queue
+  | ⊢  # pop from queue
+    ProcessQueueEntry
+  )
+  # ⊂ # prepend new queue entries (BFS)
+  ⊂: # append new queue entries (DFS)
+  # &p⧻.
+  # -- queue bestlength matrix
+)
+FindLongestPath ← (
+  StartFrom 0.
+  ⊙0 # start with bestlength 0
+  ⍢(⊃(FindLongestPathStep|⋅⋅∘)|±⧻)
+  ⋅⊙; # drop queue and matrix
+)
+PartTwo ← (
+  Parse
+
+  RemoveSlopes
+
+  MakePathMatrix
+  &p⍜now(FindLongestPath)
+)
+
+$ #.#####################
+$ #.......#########...###
+$ #######.#########.#.###
+$ ###.....#.>.>.###.#.###
+$ ###v#####.#v#.###.#.###
+$ ###.>...#.#.#.....#...#
+$ ###v###.#.#.#########.#
+$ ###...#.#.#.......#...#
+$ #####.#.#.#######.#.###
+$ #.....#.#.#.......#...#
+$ #.#####.#.#.#########v#
+$ #.#...#...#...###...>.#
+$ #.#.#v#######v###.###v#
+$ #...#.>.#...>.>.#.###.#
+$ #####v#.#.###v#.#.###.#
+$ #.....#...#...#.#.#...#
+$ #.#########.###.#.#.###
+$ #...###...#...#...#.###
+$ ###.###.#.###v#####v###
+$ #...#...#.#.>.>.#.>.###
+$ #.###.###.#.###.#.#v###
+$ #.....###...###...#...#
+$ #####################.#
+⍤⊃⋅∘≍ 154 PartTwo
+```
