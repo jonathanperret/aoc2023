@@ -77,7 +77,7 @@ Et voilà, il ne faut plus faire `64` pas mais `26501365`, c'est pas la même ma
 
 Et en plus, la carte se répète à l'infini…
 
-Déjà, j'essaie de lancer mon code de la parite 1 avec un peu plus de `64` étapes. Il me donne des nombres délirants de cases (plus que n'en contient la carte de base), du coup je corrige mon bug qui vient du fait que `pick` avec des coordonnées négatives prend les éléments en fin de liste (du coup `fill``pick` n'est que partiellement intéressant : si on donne un indice au-delà du tableau ça donne bien la valeur par défaut, mais si on donne un indice négatif dont la valeur absolue ne dépasse pas la longueur du tableau, on a l'effet miroir…). Bref je dois vérifier que je n'utilise pas de coordonnées négatives.
+Déjà, j'essaie de lancer mon code de la partie 1 avec un peu plus de `64` étapes. Il me donne des nombres délirants de cases (plus que n'en contient la carte de base), du coup je corrige mon bug qui vient du fait que `pick` avec des coordonnées négatives prend les éléments en fin de liste (du coup `fill``pick` n'est que partiellement intéressant : si on donne un indice au-delà du tableau ça donne bien la valeur par défaut, mais si on donne un indice négatif dont la valeur absolue ne dépasse pas la longueur du tableau, on a l'effet miroir…). Bref je dois vérifier que je n'utilise pas de coordonnées négatives.
 
 Je visualise le résultat et au bout de `129` itérations on arrive à ça (7539 cases atteintes) :
 
