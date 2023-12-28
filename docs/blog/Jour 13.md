@@ -104,3 +104,5 @@ Ah, bien sûr, la réponse est dans l'énoncé. Il faut que le changement de bit
 Du coup j'énumère les scores possibles d'une grille avec toutes les permutations de bit possibles, j'utilise `deduplicate` pour trouver les scores distincts, et j'élimie le score obtenu sans permutation de bit.
 
 Je tombe sur des erreurs étranges.
+
+##### Aller au jour : [1](Jour%201) [2](Jour%202) [3](Jour%203) [4](Jour%204) [5](Jour%205) [6](Jour%206) [7](Jour%207) [8](Jour%208) [9](Jour%209) [10](Jour%2010) [11](Jour%2011) [12](Jour%2012) 13 [14](Jour%2014) [15](Jour%2015) [16](Jour%2016) [17](Jour%2017) [18](Jour%2018) [19](Jour%2019) [20](Jour%2020) [21](Jour%2021) [22](Jour%2022) [23](Jour%2023) [24](Jour%2024) [25](Jour%2025) 
