@@ -509,8 +509,6 @@ RepeatToEnd ← (
   )
   ;;
   ⊃(Count Energized|KeepHGBD)
-
-  ⊙(&gifs 30 ≡(▽↯⧻,:⍉▽↯⧻,,:10))
 )
 PartOne ← (
   Parse
