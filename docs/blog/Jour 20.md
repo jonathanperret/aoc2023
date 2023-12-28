@@ -16,7 +16,7 @@ broadcaster -> a, b, c
 
 Tiens, avant de lire la suite de l'énoncé je vais faire une petite visualisation Graphviz, pour voir.
 
-Je pourrais traiter le fichier d'entrée avec `awk` pour générer le source Graphviz et ça irait plus vite, mais j'en profite pour écrire la parser en Uiua.
+Je pourrais traiter le fichier d'entrée avec `awk` pour générer le source Graphviz et ça irait plus vite, mais j'en profite pour écrire le parser en Uiua.
 
 ![](day20.svg)
 
@@ -156,9 +156,9 @@ Voilà, j'ai maintenant quelques assertions de type. Ce n'est pas parfait parce 
 
 Bref, j'ai l'impression que c'est un compromis qui peut fonctionner et je suis curieux de voir ce que ça va donner.
 
-D'ailleurs, maintenant que j'ai ces assertions de type je ne me prive pas de les utiliser en-dehors des tests. En fait je les saupoudre un peut partout où je sais qu'une valeur est d'un certain type, et ça me rassure en même temps que ça m'aide pour la relecture.
+D'ailleurs, maintenant que j'ai ces assertions de type je ne me prive pas de les utiliser en-dehors des tests. En fait je les saupoudre un peu partout où je sais qu'une valeur est d'un certain type, et ça me rassure en même temps que ça m'aide pour la relecture.
 
-Un changement que je fais en cours de route, c'est de changer ma représentation des nœuds : au lieu d'avoir quatre tableaux sur la pile (types, listes de nœuds en sortie, listes de nœuds en entrée, noms), je me rends compte que même si ça évite certaines manipulations de boîtes, cette structure n'est pas très commode à manipuler. Je reviens donc un peu un arrière sur l'approche "tableaux parallèles" et je crée un tableau de nœuds contenant sur chaque ligne quatre boîtes correspondant aux attributs du nœud.
+Un changement que je fais en cours de route, c'est de changer ma représentation des nœuds : quatre tableaux sur la pile (types, listes de nœuds en sortie, listes de nœuds en entrée, noms), je me rends compte que même si ça évite certaines manipulations de boîtes, cette structure n'est pas très commode à manipuler. Je reviens donc un peu un arrière sur l'approche "tableaux parallèles" et je crée un tableau de nœuds contenant sur chaque ligne quatre boîtes correspondant aux attributs du nœud.
 
 En revanche, je conserve les états des nœuds dans un tableau parallèle à côté sur la pile. Ça me paraît un bon compromis.
 
