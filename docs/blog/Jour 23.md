@@ -34,11 +34,11 @@ Les `#` sont des murs (enfin de la forêt mais bon). Les `>v` (il n'y a pas de `
 
 La question qui est posée dans cette première partie, c'est celle du chemin le plus _long_ qui existe entre le coin supérieur gauche et le coin inférieur droit.
 
-Je commence par améliorer un peu la lisibilité du labyrinthe, qui est quand même assez contraint :
+Je commence par améliorer un peu la lisibilité du labyrinthe, qui se révèle assez contraint :
 
 ![](day23.png)
 
-Je ne sais plus comment on calcule un chemin le plus long dans un graphe (tout ce dont je me souviens, c'est que c'est un exemple de problème qui ne se prête pas à la programmation dynamique parce qu'il ne se décompose pas bien en sous-problèmes), mais Wikipedia pourra sûrement m'aider.
+Je ne sais pas comment on calcule un chemin le plus long dans un graphe (tout ce dont je me souviens, c'est que c'est un exemple de problème qui ne se prête pas à la programmation dynamique parce qu'il ne se décompose pas bien en sous-problèmes), mais Wikipedia pourra sûrement m'aider.
 
 Je me dis cependant déjà qu'il est largement possible de simplifier le graphe de ce labyrinthe. Comme on ne peut pas faire demi-tour, chaque long couloir entre deux embranchements peut être transformé en une seule arête.
 
@@ -56,7 +56,7 @@ Commençons par le parcours du labyrinthe pour compter les longueurs des couloir
 
 Je réalise que les symboles `>` et `v` n'ont aucun impact dans la première moitié du parcours, où un couloir se divise en deux. En revanche dans la deuxième moitié, où les couloirs se rejoignent, ils sont essentiels pour éviter de prendre un couloir à l'envers.
 
-Encore un long tunnel d'implémentation. Après plusieurs faux départs, j'arrive à énumérer les chemins entre les "carrefours". Puis je construis le graphe de ces chemins (sous la forme d'une matrice d'adjacence). Il ne me reste qu'à énumérer les chemins possibles dans ce nouveau graphe pour trouver la longueur maximale.
+Encore un long tunnel d'implémentation. Après plusieurs faux départs, j'arrive à énumérer les chemins entre les "carrefours". Puis je construis le graphe de ces chemins (sous la forme d'une matrice d'adjacence). Il ne me reste qu'à énumérer les chemins possibles (j'ai laissé tomber la programmation dynamique) dans ce nouveau graphe pour trouver la longueur maximale.
 
 ```
 Parse ← ⊜∘≠@\n.
