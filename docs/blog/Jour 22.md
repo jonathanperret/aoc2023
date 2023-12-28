@@ -1,3 +1,5 @@
+# Jour 22
+
 ## Partie 1
 
 Je jette un œil à l'entrée avant de lire l'énoncé :

@@ -1,3 +1,5 @@
+# Jour 2
+
 Où l'on atterrit dans le ciel et on joue aux cubes.
 
 Attention, aujourd'hui je m'y suis pris n'importe comment. Pour la lecture de l'entrée, en tout cas.

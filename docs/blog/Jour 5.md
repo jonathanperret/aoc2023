@@ -1,3 +1,5 @@
+# Jour 5
+
 ## Ce que j'ai retenu des épisodes précédents
 
 Ça n'a pas trop mal marché de rédiger en même temps que je réfléchissais au problème. Quand les jours avancent et que les problèmes se complexifient, il devient de toute façon indispensable de se poser un peu avant de se lancer dans l'implémentation.

@@ -1,3 +1,5 @@
+# Jour 6
+
 ## Ce que j'ai retenu des épisodes précédents
 
 Ne pas faire confiance à des estimations de complexité faites au doigt mouillé ?

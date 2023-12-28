@@ -1,3 +1,5 @@
+# Jour 4
+
 ## Ce que j'ai retenu des épisodes précédents
 
 Ça prend vraiment du temps d'écrire ce journal ! D'autant que je le fais essentiellement après avoir terminé de résoudre les problèmes. Je vais tenter de noter plus au fil de l'eau, et probablement alléger le niveau de détail pour que ça reste faisable.

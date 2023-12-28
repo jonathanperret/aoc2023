@@ -1,3 +1,5 @@
+# Jour 24
+
 ## Partie 1
 
 C'est pas encore tout à fait Noël et pour mériter ses cadeaux, il reste encore un paquet de lignes dont il faut trouver les intersections :

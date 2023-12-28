@@ -1,3 +1,5 @@
+# Jour 8
+
 ## Partie 1
 
 Aujourd'hui j'ai voulu essayer quelque chose de différent : ne pas écrire ce journal pendant que j'essayais de résoudre le problème, le plus vite possible.
