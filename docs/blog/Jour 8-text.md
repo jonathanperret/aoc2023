@@ -11,15 +11,15 @@ Le résultat n'est pas une réussite. J'ai l'impression d'avoir été inefficace
 Bref, l'énoncé me donne ces données d'exemple :
 
 ```no_run
-$ RL
-$
-$ AAA = (BBB, CCC)
-$ BBB = (DDD, EEE)
-$ CCC = (ZZZ, GGG)
-$ DDD = (DDD, DDD)
-$ EEE = (EEE, EEE)
-$ GGG = (GGG, GGG)
-$ ZZZ = (ZZZ, ZZZ)
+RL
+
+AAA = (BBB, CCC)
+BBB = (DDD, EEE)
+CCC = (ZZZ, GGG)
+DDD = (DDD, DDD)
+EEE = (EEE, EEE)
+GGG = (GGG, GGG)
+ZZZ = (ZZZ, ZZZ)
 ```
 
 La première ligne est une liste d'instructions (R=aller à droite, L=aller à gauche).
@@ -76,7 +76,7 @@ Step
 
 J'écris ensuite `Walk` qui prend une liste d'instructions et la liste des liens,  et fait le parcours à partir du nœud `AAA`. J'utilise `fold` et c'est un peu technique : il faut que la fonction passée à `fold` remette la pile dans l'état où elle souhaite la trouver à l'itération suivante.
 
-Ici, l'état de pile qu'on veut conserver d'une itération à l'autre, c'est le nœud courant en haut, suivi de la liste de liens. On utilise donc un `fork` dont une branche consomme via `Step` l'instruction fournie par `fold`, le nœud courant et la liste de liens, en remplaçant tout ça par le nouveau nœud ; et l'autre branche va aller repêcher avec les "planètes" `gap``gap``id` la liste de liens à deux niveaux sous le haut de la pile.
+Ici, l'état de pile qu'on veut conserver d'une itération à l'autre, c'est le nœud courant en haut, suivi de la liste de liens. On utilise donc un `fork` dont une branche consomme via `Step` l'instruction fournie par `fold`, le nœud courant et la liste de liens, en remplaçant tout ça par le nouveau nœud ; et l'autre branche va aller repêcher avec les "planètes" `gap``gap``identity` la liste de liens à deux niveaux sous le haut de la pile.
 
 On se retrouve donc bien à l'arrivée avec le nouveau nœud suivi de la liste des liens.
 
@@ -370,9 +370,122 @@ $ ZZZ = (ZZZ, ZZZ)
 
 ### La vraie Partie 2
 
-En attendant que je rédige ça, une petite visualisation :
+Je me lance dans une implémentation compliquée qui simule le parcours simultané des multiples fantômes à travers le graphe. Pour représenter la position des différents fantômes, je choisis un vecteur booléen qui contient un `1` pour chaque nœud actuellement occupé par un fantôme. Et pour faire avancer la simulation, je construis une matrice booléenne à partir de la table des liens : à chaque étape, le nouveau vecteur d'état est donc obtenu en combinant les lignes de la matrice sélectionnées par le vecteur actuel. Une sorte de multiplication matrice-vecteur, finalement.
+
+C'est une solution assez élégante qui me permettrait par exemple de connaître l'état du système au bout d'un très grand nombre d'itérations, en appliquant une exponentiation rapide à la matrice.
+
+Le problème, c'est que ce n'est pas la question qui est posée ! Et quand je fais tourner ma simulation, je vois régulièrement des fantômes passer par un nœud `Z` mais je vois bien qu'on est loin d'arriver à une étape où ils sont tous simultanément sur un nœud `Z`.
+
+À court d'idées je tente une visualisation de l'entrée avec [Graphviz](https://graphviz.org) :
+
 ![](day8.svg)
 
-#### fin
+Et je comprends alors à quel point l'entrée est spécifiquement construite pour que les fantômes se déplacent chacun sur leur propre circuit. Et il semble logique que les fantômes visitent leur nœud `Z` respectif à intervalle régulier.
+
+Si chaque fantôme visite un nœud `Z` à un certain intervalle, le moment où ils seront tous en même temps sur un nœud `Z` sera donné par le plus petit multiple commun (PPCM) des longueurs de cycles.
+
+Il me suffit donc de mesurer ces longueurs de cycles en simulant chaque fantôme suffisamment longtemps pour qu'il arrive à son nœud `Z`, et de prendre ensuite le PPCM de ces longueurs.
+
+Je me débarrasse donc de toute mon implémentation à base de matrice pour reprendre ma simulation simple, j'ajoute un calcul de PPCM et j'ai enfin ma réponse.
+
+```
+# input -- program namelist links
+Parse ← (
+  ⊜□ ≠@\n. # split lines
+  ⊃(
+    °□ ⊢ # get program line
+    =@R  # convert program to 0/1
+  | ↘1   # drop program line
+    # extract node names and links
+    ≡(
+      °□
+      ⊃(
+        ↙3                # node name
+        | [⊃(↙3↘7|↙3↘12)] # left and right links
+      )
+    )
+    ⊃(
+      ∘  # keep name list for later
+    | :¤ # fix name list
+      ≡⊗ # lookup left & right node names
+      ⍉  # put in rows
+    )
+  )
+)
+
+# instr node endnodes links -- newnode endnodes links
+ExecuteInstruction ← (
+  ⊃(
+    ⊃(
+      ⋅∘    # get current node
+    | ⊡⊙⋅⋅∘ # pick link row from instruction
+    )
+    ⊡    # lookup target node
+  | ⋅⋅⊙∘ # keep end list and links
+  )
+)
+
+# node endnodes -- bool
+EndReached ← ∊
+
+# pc program node ends links -- pc+1 program newnode endnodes links
+ProgramStep ← (
+  ⊃(
+    +1 # increment program counter
+    ⊙∘ # keep program
+  | ⧻, # get program length
+    ◿  # pc mod program length
+    ⊡  # get instruction
+    ExecuteInstruction
+  )
+)
+
+# namelist -- startnodes endnodes
+FindMultiStartEnd ← (
+  ≡(⊢⇌) # last letter of each name
+  ⊃(
+    ⊚=@A # indices of start nodes
+  | ⊚=@Z # indices of end nodes
+  )
+)
+
+# program, startnode, endnodes, links
+WalkToEnd ← (
+  0 # program counter
+  ⍢ProgramStep (¬⋅⋅EndReached)
+  ⊙⋅⋅⋅; # drop state
+)
+
+# program, startnodes, endnodes, links
+FindPeriods ← (
+  ⊓(¤|∘|¤|¤) # fix program, endnodes, links
+  ≡WalkToEnd # run program for each startnode
+)
+
+GCD ← ;⍢(
+  ⊃↧↥ # put smaller number on top
+  ⊃◿∘ # remove smaller from larger
+) (≠0)
+LCM ← ×÷GCD,, # lcm(a,b) = ab/gcd(a,b)
+
+PartTwo ← (
+  Parse
+  ⊙FindMultiStartEnd
+  FindPeriods
+  /LCM
+)
+
+$ LR
+$
+$ 11A = (11B, XXX)
+$ 11B = (XXX, 11Z)
+$ 11Z = (11B, XXX)
+$ 22A = (22B, XXX)
+$ 22B = (22C, 22C)
+$ 22C = (22Z, 22Z)
+$ 22Z = (22B, 22B)
+$ XXX = (XXX, XXX)
+⍤⊃⋅∘≍ 6 PartTwo
+```
 
 ##### Aller au jour : [1](Jour%201) [2](Jour%202) [3](Jour%203) [4](Jour%204) [5](Jour%205) [6](Jour%206) [7](Jour%207) 8 [9](Jour%209) [10](Jour%2010) [11](Jour%2011) [12](Jour%2012) [13](Jour%2013) [14](Jour%2014) [15](Jour%2015) [16](Jour%2016) [17](Jour%2017) [18](Jour%2018) [19](Jour%2019) [20](Jour%2020) [21](Jour%2021) [22](Jour%2022) [23](Jour%2023) [24](Jour%2024) [25](Jour%2025) 
