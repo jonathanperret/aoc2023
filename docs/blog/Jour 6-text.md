@@ -13,15 +13,15 @@ Aussi, certaines des solutions Uiua au problème d'hier que j'ai vues m'ont mont
 On me donne une liste de temps et des distances correspondantes :
 
 ```no_run
-$ Time:      7  15   30
-$ Distance:  9  40  200
+Time:      7  15   30
+Distance:  9  40  200
 ```
 
 Je regarde vite fait, l'entrée complète n'est étonnamment pas beaucoup plus grosse que l'exemple :
 
 ```no_run
-$ Time:        46     82     84     79
-$ Distance:   347   1522   1406   1471
+Time:        46     82     84     79
+Distance:   347   1522   1406   1471
 ```
 
 Il s'agit d'une série de courses de bateaux miniatures. Dans chaque course (une colonne de l'entrée) je peux choisir combien de temps je fais accélérer le bateau au début de la course (1 milliseconde d'accélération = 1 millimètre par milliseconde en plus) et ensuite le bateau va passer le temps restant à avancer. Une course n'est gagnée que si le bateau a parcouru une distance supérieure au record indiqué.

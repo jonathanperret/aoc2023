@@ -11,7 +11,7 @@ Attention, aujourd'hui je m'y suis pris n'importe comment. Pour la lecture de l'
 On commence avec une série de lignes qui ressemblent à ceci :
 
 ```no_run
-$ Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 ```
 
 Cette ligne représente une partie d'un jeu (la partie numéro 1). La partie se compose de trois tours (séparés par des points-virgules), chaque tour indiquant le nombre de cubes de chaque couleur utilisés ce tour. Noter que les couleurs ne sont pas toujours dans le même ordre et ne sont pas toujours toutes mentionnées.

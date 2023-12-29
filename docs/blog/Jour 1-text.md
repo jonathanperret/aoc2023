@@ -9,10 +9,10 @@ Youpi, il est de nouveau temps d'aider les Elfes.
 On commence avec une chaîne composée de lignes comme ça :
 
 ```no_run
-$ 1abc2
-$ pqr3stu8vwx
-$ a1b2c3d4e5f
-$ treb7uchet
+1abc2
+pqr3stu8vwx
+a1b2c3d4e5f
+treb7uchet
 ```
 
 Il faut trouver sur chaque ligne le premier et le dernier chiffre, donc par exemple dans `pqr3stu8vwx` c'est `3` et `8`, et dans `trb7uchet` c'est deux fois `7`.

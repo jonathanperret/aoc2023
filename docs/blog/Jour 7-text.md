@@ -13,11 +13,11 @@ Le jeu, c'est un peu comme le poker : on a chacun 5 cartes en main, et la main 
 En entrée j'ai une liste de mains et les montants associés :
 
 ```no_run
-$ 32T3K 765
-$ T55J5 684
-$ KK677 28
-$ KTJJT 220
-$ QQQJA 483
+32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483
 ```
 
 La règle, c'est que la main la plus faible gagne le montant indiqué en face, la deuxième gagne le double, etc. jusqu'à la plus forte qui gagnera (ici) 5 fois son montant.
