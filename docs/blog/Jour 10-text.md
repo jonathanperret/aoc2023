@@ -6,7 +6,7 @@
 
 J'utilise le delta-plane pour atteindre une île de métal.
 
-Me voici face à une matrice de tuyaux de 140x140 cellules (des tuyaux) dans laquelle se trouve un animal (indiqué par `S`).
+Me voici face à une matrice de tuyaux de 140x140 cellules dans laquelle se trouve un animal (indiqué par `S`).
 
 ```no_run
 ..F7.
@@ -119,7 +119,7 @@ Directions @J
 
 J'ai indiqué toutes les directions possibles pour le `S` mais bien sûr c'est à raffiner.
 
-Ensuite j'écris une fonction `Neighbors` qui va bien sûr énumérer les voisins accessibles d'une cellule.
+Ensuite j'écris une fonction `Neighbors` qui va énumérer les voisins accessibles d'une cellule.
 
 J'ai besoin de créer `TryPick` qui va chercher dans la matrice aux coordonnées demandées, mais renvoie `.` pour les cellules de coordonnées négatives (car `pick` interprète les indices négatifs comme devant chercher à partir de la fin du tableau, ce qui ne m'arrange pas).
 

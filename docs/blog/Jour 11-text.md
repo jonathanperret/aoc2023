@@ -149,12 +149,7 @@ Distance 6_1 11_5
 
 Reste à calculer ça sur toutes les paires de galaxies.
 
-La fonction `cross` ma paraît indiquée. Le seul inconvénient c'est qu'elle va calculer chaque paire deux fois. Pas de problème, je diviserai la somme par 2.
-
-```
-AllDistances ← ⊠Distance.⊚
-AllDistances
-```
+La fonction `cross` me paraît indiquée. Le seul inconvénient c'est qu'elle va calculer chaque paire deux fois. Pas de problème, je diviserai la somme par 2.
 
 Et voici donc `PartOne` :
 

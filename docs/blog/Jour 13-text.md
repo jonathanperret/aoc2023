@@ -58,7 +58,7 @@ Parse
 
 Sinon, c'est quoi mon plan ?
 
-L'entrée ne comporte pas de grilles beaucoup plus grosses que l'exemple : `17x17` caraactères au maximum. Et il y en a `100`.
+L'entrée ne comporte pas de grilles beaucoup plus grosses que l'exemple : `17x17` caractères au maximum. Et il y en a `100`.
 
 On dirait que pour cette première partie en tout cas, essayer toutes les possibilités est jouable.
 
@@ -70,6 +70,7 @@ Ah, pour comparer plus rapidement les lignes entre elles, je les convertis en en
 
 ```
 ParseGrid ← ⊜(=@#)≠@\n.
+Numberize ← °⋯
 
 $ #...##..#
 $ #....#..#
@@ -79,13 +80,75 @@ $ #####.##.
 $ ..##..###
 $ #....#..#
 ParseGrid
-°⋯
+Numberize
 ```
 
-Pour trouver une paire de lignes identiques, je compare les éléments consécutifs avec `windows`.
+Et pour trouver une paire de lignes identiques, je regroupe les paires d'éléments consécutifs avec `windows`, je `transpose` la matrice obtenue puis j'applique `reduce``equals` pour comparer les deux lignes obtenues. Enfin `where` me donne les indices où deux nombres identiques se suivent.
 
+Il ne me reste qu'à vérifier chacune de ces positions candidates en extrayant les lignes ou colonnes concernées et en les comparant.
 
-TODO
+Pour finir, comme indiqué par l'énoncé il faut multiplier par `100` la position d'un axe horizontal éventuel et additionner celle d'un axe vertical.
+
+```
+ParseGrid ← ⊜(=@#)≠@\n.
+Parse ← ⊜(□ParseGrid)¬⌕ "\n\n".
+Numberize ← °⋯
+Candidates ← +1⊚/=⍉◫2
+TestCandidate ← (
+  ⊃(⇌↙|↘)
+  ↧⊃(∩△|⊙∘)
+  ⊃(⊙∘|⊙⋅∘)
+  ∩↯
+  ≍
+)
+FindAxes ← (|1
+  Candidates.
+  ⊙¤
+  .
+  :⊙≡TestCandidate
+  ([0]|▽)±/+.
+)
+ScoreGridA ← (|1
+  Numberize
+  FindAxes
+  ×100
+)
+ScoreGridB ← (|1
+  ⍉
+  Numberize
+  FindAxes
+)
+ScoreGrid ← (|1
+  ScoreGridA.
+  :
+  ScoreGridB
+  ⊂
+  ⊝
+  ▽ ±.
+)
+PartOne ← (
+  Parse
+  ≡(⊢ScoreGrid °□)
+  /+
+)
+
+$ #.##..##.
+$ ..#.##.#.
+$ ##......#
+$ ##......#
+$ ..#.##.#.
+$ ..##..##.
+$ #.#.##.#.
+$
+$ #...##..#
+$ #....#..#
+$ ..##..###
+$ #####.##.
+$ #####.##.
+$ ..##..###
+$ #....#..#
+⍤⊃⋅∘≍ 405 PartOne
+```
 
 ## Partie 2
 
@@ -105,8 +168,114 @@ Ces multiples ne seraient pas grave s'ils ramenaient toujours au même axe de sy
 
 Ah, bien sûr, la réponse est dans l'énoncé. Il faut que le changement de bit donne une _nouvelle_ ligne de réflexion.
 
-Du coup j'énumère les scores possibles d'une grille avec toutes les permutations de bit possibles, j'utilise `deduplicate` pour trouver les scores distincts, et j'élimie le score obtenu sans permutation de bit.
+Du coup j'énumère les scores possibles d'une grille avec toutes les permutations de bit possibles, j'utilise `deduplicate` pour trouver les scores distincts, et j'élimine le score obtenu sans permutation de bit.
 
-Je tombe sur des erreurs étranges.
+Ça devrait fonctionner, mais c'est alors que je tombe sur un bug de l'interpréteur Uiua… quand j'écris le code d'une certaine façon, l'interpréteur s'arrête avec une erreur interne. Je finis par essayer une version plus ancienne de l'interpréteur Uiua, qui fonctionne sur mon programme. Je signale ensuite ce bug via Discord au créateur de Uiua qui se penche dessus.
+
+```
+ParseGrid ← ⊜(=@#)≠@\n.
+Parse ← ⊜(□ParseGrid)¬⌕ "\n\n".
+Numberize ← °⋯
+Candidates ← +1⊚/=⍉◫2
+TestCandidate ← (
+  ⊃(⇌↙|↘)
+  ↧⊃(∩△|⊙∘)
+  ⊃(⊙∘|⊙⋅∘)
+  ∩↯
+  ≍
+)
+FindAxes ← (|1
+  Candidates.
+  ⊙¤
+  .
+  :⊙≡TestCandidate
+  ([0]|▽)±/+.
+)
+ScoreGridA ← (|1
+  Numberize
+  FindAxes
+  ×100
+)
+ScoreGridB ← (|1
+  ⍉
+  Numberize
+  FindAxes
+)
+ScoreGrid ← (|1
+  ScoreGridA.
+  :
+  ScoreGridB
+  ⊂
+  ⊝
+  ▽ ±.
+)
+FlipBit ← (
+  ⊙⊃∘△
+  ⊙♭
+  ⍜(⊡)¬
+  ↯:
+)
+ScoreSmudged ← (
+  ⊃∘(+ScoreGrid)
+  /×△.
+  ⇡
+  ⊙¤
+  ≡FlipBit
+  ≡(ScoreGrid)
+  ⊂
+  ▽±.
+  ⊝
+  :
+  ⊙.
+  ▽≠
+  ⊢
+)
+PartTwoGrid ← (
+  .
+  ⊢ScoreGrid
+  :
+  /×△.
+  ⇡
+  ⊙¤
+  ≡FlipBit
+  .
+  ≡(□ScoreGridA)
+  :
+  ≡(□ScoreGridB)
+  ⊂
+  /⊐⊂
+  ▽±.
+  ⊝
+  :
+  ⊙.
+  ▽≠
+  ⊢
+)
+PartTwo ← (
+  Parse
+  ≡(
+    °□
+    PartTwoGrid
+  )
+  /+
+)
+
+$ #.##..##.
+$ ..#.##.#.
+$ ##......#
+$ ##......#
+$ ..#.##.#.
+$ ..##..##.
+$ #.#.##.#.
+$
+$ #...##..#
+$ #....#..#
+$ ..##..###
+$ #####.##.
+$ #####.##.
+$ ..##..###
+$ #....#..#
+⍤⊃⋅∘≍ 400 PartTwo
+```
 
 ##### Aller au jour : [1](Jour%201) [2](Jour%202) [3](Jour%203) [4](Jour%204) [5](Jour%205) [6](Jour%206) [7](Jour%207) [8](Jour%208) [9](Jour%209) [10](Jour%2010) [11](Jour%2011) [12](Jour%2012) 13 [14](Jour%2014) [15](Jour%2015) [16](Jour%2016) [17](Jour%2017) [18](Jour%2018) [19](Jour%2019) [20](Jour%2020) [21](Jour%2021) [22](Jour%2022) [23](Jour%2023) [24](Jour%2024) [25](Jour%2025) 

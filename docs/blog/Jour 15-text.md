@@ -18,7 +18,7 @@ Il y a `11` sous-chaînes (séparées par `,`) dans cet exemple. Chacune doit ê
 * Prendre le code ASCII du premier caractère de la chaîne ;
 * Augmenter la _valeur en cours_ (qui a commencé à `0`) de ce code ;
 * Multiplier la _valeur en cours_ par `17` ;
-* Appliquer un `modulo` `256` à la `_valeur en cours_` ;
+* Appliquer un _modulo_ `256` à la _valeur en cours_ ;
 * Continuer avec le caractère suivant.
 
 Le résultat du hachage est la _valeur en cours_ à la fin de la chaîne.
@@ -77,15 +77,17 @@ Enfin bon, j'en viens à bout, à renfort de _switch functions_ surtout.
 Ensuite il ne me reste qu'à appliquer toutes les instructions en séquence (`fold` encore), puis calculer le score final, ce qui se fait assez simplement — à part quand je tombe sur un cas particulier de liste vide : 
 
 ```
-/+ [1 2]
+/+ [1 2] # la somme d'un tableau de nombres, ça marche
 ## 3
-/+ ↙ 0 []
+/+ ↙ 0 [] # si le tableau est vide, ça donne zéro
 ## 0
-/+ ≡°□ [□1 □2]
+/+ ≡°□ [□1 □2] # la somme d'un tableau de boîtes, on sait faire aussi
 ## 3
-/+ ≡°□ ↙ 0 [□1 □2]
+/+ ≡°□ ↙ 0 [□1 □2] # mais s'il est vide… ça ne fait pas zéro
 ## []
 ```
+
+Du coup je gère ce cas particulier à part.
 
 Voilà le résultat final :
 

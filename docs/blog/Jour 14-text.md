@@ -6,7 +6,7 @@
 
 Des pierres à déplacer pour focaliser un miroir (encore !) parabolique…
 
-On a donc une plate-forme avec des pierres rondes qui roulent (`O`), des pierres carrées qui ne bougents pas (`#`), et des espaces vides (`.`) :
+On a donc une plate-forme avec des pierres rondes qui roulent (`O`), des pierres carrées qui ne bougent pas (`#`), et des espaces vides (`.`) :
 
 ```no_run
 O....#....
@@ -47,7 +47,7 @@ Ensuite, quelle est la position finale de chaque `O` ? Je pense que c'est la po
 
 Ah, mais si je partage chaque colonne en groupes séparés par les `#`, il me suffirait de trier les intervalles pour avoir tous les `O` avant les `.`. Je n'ai pas besoin d'ajouter des `#` en haut, d'ailleurs.
 
-D'abord je vais transposer la matrice avec `transpose` pour que les colonnes deviennent des lignes. Puis je pourrai un modificateur magique de Uiua.
+D'abord je vais transposer la matrice avec `transpose` pour que les colonnes deviennent des lignes. Puis je pourrai utiliser un modificateur magique de Uiua.
 
 ### La magie de `under`
 
@@ -55,7 +55,7 @@ D'abord je vais transposer la matrice avec `transpose` pour que les colonnes dev
 
 L'idée, c'est que `⍜ F G` applique une première fonction (`F`) à une valeur, puis une deuxième fonction (`G`), et enfin "annule" les effets de la première fonction (`F`).
 
-Prenons un exemple simple : je veux multiplier un nombre par `1000` (donc `* 1000`), lui ajouter `1` (`+ 1`), puis le re-diviser par `1000` :
+Prenons un exemple simple : je veux multiplier un nombre par `1000` (donc `× 1000`), lui ajouter `1` (`+ 1`), puis le re-diviser par `1000` :
 
 ```
 1234
@@ -369,7 +369,7 @@ Mais pour que ce soit plus visible, je remplace ces nombres sans âme par quelqu
  184 185 186 174 175 176 173 177 178 179 180 181 182 183 184 185 186 174 175 176
  173 177 178 179 180 181 182 183 184 185 186 174 175 176 173 177 178 179 180 181]
 
-&p +65536 +@\uf300
+&p +@🌀
 ```
 
 Là, c'est nettement plus clair.
